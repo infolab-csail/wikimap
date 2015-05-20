@@ -9,7 +9,7 @@ def main():
         infoboxAttributes = json.load(fp)
         emptyAttributes = {}
         
-        wb = open_workbook('infoboxes.xlsx')
+        wb = open_workbook('data/infoboxes.xlsx')
         sheet = wb.sheet_by_index(0)
 
         totalPages = 0
@@ -31,7 +31,7 @@ def main():
                     mostMissedTemplate = row
 
         print 'Done. Writing to disk...'
-        with open('emptyAttributes.json', 'wb') as fp:
+        with open('data/emptyAttributes.json', 'wb') as fp:
             json.dump(emptyAttributes, fp)
 
         print
