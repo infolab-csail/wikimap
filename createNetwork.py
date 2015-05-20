@@ -1,12 +1,13 @@
 import json
 import networkx as nx
+import synonym_network as sn
 # import matplotlib.pyplot as plt
 # import pydot
 
 def main():
     with open('data/infoboxes.json', 'rb') as fp:
         infoboxAttributes = json.load(fp)
-        G=nx.DiGraph()
+        G=sn.SynonymNetwork()
         numberOfPairs = 0
 
         for infobox, synonyms in infoboxAttributes.iteritems():
