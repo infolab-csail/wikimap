@@ -14,15 +14,14 @@ def main():
             for unrend, rend in synonyms.iteritems():
                 numberOfPairs += 1
 
-                # NODES
+                G.add_edge(unrend, rend)
+                # To convert into clean strings:
+                # node = str(node.encode('ascii', 'ignore'))
+
+                # NODE ATTRIBUTES
                 rendState = 'unrend' # first deal with unrend
                 for node in (unrend, rend):
-                    # To convert into clean strings:
-                    # node = str(node.encode('ascii', 'ignore'))
-                    
-                    if node not in G: G.add_node(node) # if it's not there, add it
 
-                    # whether or not node existed before, it's there now
                     if (infobox in G.node[node].keys()) and (rendState not in G.node[node][infobox]):
                         # if infobox there, but rendState not there already, append rendState
                         G.node[node][infobox].append(rendState)
@@ -34,8 +33,7 @@ def main():
                     rendState = 'rend' # now we're dealing with rend
 
 
-                # EDGES
-                if not G.has_edge(unrend, rend): G.add_edge(unrend, rend) # if it's not there, add it
+                # EDGE ATTRIBUTES
                 if ('infobox' in G.edge[unrend][rend].keys()) and (infobox not in G.edge[unrend][rend]['infobox']):
                     G.edge[unrend][rend]['infobox'].append(infobox)
                 else:
