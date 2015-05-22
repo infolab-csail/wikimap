@@ -57,3 +57,10 @@ class SynonymNetwork(nx.DiGraph):
         for nodeName in self.nodes():
             infoboxes = infoboxes + self.infoboxes_of_graph_node(nodeName)
         return list(set(infoboxes))
+
+    def rendering_of_graph_node(self, nodeName):
+        """Return either 'unrend', 'rend', or 'mixed' about a node"""
+        rendingList = [item for sublist in self.node[nodeName].values() for item in sublist] # due to flattening [['unrend'],['rend','unrend']] etc.
+        if all(items == 'unrend' for items in rendingList): return 'unrend'
+        elif all(items == 'rend' for items in rendingList): return 'rend'
+        else: return 'mixed'
