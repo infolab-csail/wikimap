@@ -37,10 +37,10 @@ class SynonymNetwork(nx.DiGraph):
                 print str(k) + ' nodes: ' + str(v) + ' (' + str(percent) + '%) groups'
             print '-----------------------------------------'
             print 'TOTAL: ' + str(super(SynonymNetwork, self).number_of_nodes()) + ' nodes in network, ' + str(numberOfGroups) + ' distinct groups'
-        
-        return lengthDict
+        else:
+            return lengthDict
 
-    def connected_component_with_size(self, size):
+    def connected_components_with_size(self, size):
         """Return a list of connected component of a given size"""
         components = [x for x in nx.connected_component_subgraphs(self.return_undirected()) if x.number_of_nodes() == size]
         for graph in components:
@@ -67,3 +67,26 @@ class SynonymNetwork(nx.DiGraph):
         if all(items == 'unrend' for items in rendingList): return 'unrend'
         elif all(items == 'rend' for items in rendingList): return 'rend'
         else: return 'mixed'
+
+    # ANALYTICS:
+    def connected_component_nodes_with_size(self, size, showRending=False, printResults=False):
+        """Return a list of nodes for each connected component of a
+        given size, optionally showing the rendering state ('rend',
+        'unrend', or 'mixed'), and optionally priting the results in a
+        readable manner"""
+
+        graphsOfSize = self.connected_components_with_size(size)
+        if showRending:
+            ans = [{node:graph.rendering_of_graph_node(node) for node in super(SynonymNetwork, graph).nodes()} for graph in graphsOfSize]
+        else:
+            ans = [super(SynonymNetwork, graph).nodes() for graph in graphsOfSize]
+
+        if printResults:
+            for x in ans:
+                if showRending:
+                    for k,v in x.iteritems(): print k + ' (' + v + ')'
+                    print
+                else:
+                    print x
+        else:
+            return ans
