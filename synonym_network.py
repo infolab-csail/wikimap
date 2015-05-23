@@ -5,10 +5,14 @@ class SynonymNetwork(nx.DiGraph):
     # CLASS MAINTENENCE:
     def __init__(self):
         super(SynonymNetwork, self).__init__()
-        self.undirected = super(SynonymNetwork, self).to_undirected() # undirected copy
+        self.__undirectedCopy = super(SynonymNetwork, self).to_undirected() # undirected copy
 
     def update_undirected(self):
-        self.undirected = super(SynonymNetwork, self).to_undirected() # undirected copy
+        self.__undirectedCopy = super(SynonymNetwork, self).to_undirected() # undirected copy
+
+    def return_undirected(self):
+        self.update_undirected()
+        return self.__undirectedCopy
 
     @classmethod
     def convert_to_special(cls, obj):
@@ -18,8 +22,7 @@ class SynonymNetwork(nx.DiGraph):
     # GENERAL NETWORK METHODS:
     def connected_component_lengths(self):
         """Return a list of the lengths of each component"""
-        self.update_undirected()
-        return [len(x) for x in nx.connected_components(self.undirected)]
+        return [len(x) for x in nx.connected_components(self.return_undirected())]
 
     def connected_component_statistics(self, printStats=False):
         """Return a dictionary with the component length and number of such sized components"""
@@ -28,7 +31,7 @@ class SynonymNetwork(nx.DiGraph):
 
         if printStats:
             orderedLengthDict = collections.OrderedDict(sorted(lengthDict.items()))
-            numberOfGroups = nx.number_connected_components(self.undirected)
+            numberOfGroups = nx.number_connected_components(self.return_undirected())
             for k, v in orderedLengthDict.iteritems():
                 percent = round((100.00*v / numberOfGroups), 2)
                 print str(k) + ' nodes: ' + str(v) + ' (' + str(percent) + '%) groups'
@@ -39,7 +42,7 @@ class SynonymNetwork(nx.DiGraph):
 
     def connected_component_with_size(self, size):
         """Return a list of connected component of a given size"""
-        components = [x for x in nx.connected_component_subgraphs(self.undirected) if x.number_of_nodes() == size]
+        components = [x for x in nx.connected_component_subgraphs(self.return_undirected()) if x.number_of_nodes() == size]
         for graph in components:
             SynonymNetwork.convert_to_special(graph)
 
@@ -54,7 +57,7 @@ class SynonymNetwork(nx.DiGraph):
     def infoboxes_of_graph(self):
         """Return a (non-redunant) list of a graph's infoboxes"""
         infoboxes = []
-        for nodeName in self.nodes():
+        for nodeName in super(SynonymNetwork, self).nodes():
             infoboxes = infoboxes + self.infoboxes_of_graph_node(nodeName)
         return list(set(infoboxes))
 
