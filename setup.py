@@ -21,6 +21,9 @@ setup(
     entry_points={
         'console_scripts': [
             'allinfoboxattributes = attribute_analyzer.allInfoboxAttributes:main',
+            'analyzeexplosion = attribute_analyzer.analyzeExplosion:main',
+            'createnetwok = attribute_analyzer.createNetwork:main',
+            'findempty = attribute_analyzer.findEmpty:main',
         ],
     },
 
