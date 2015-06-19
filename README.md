@@ -17,9 +17,9 @@ $ sudo pip install -r requirements.txt
 
 2: Clone this repo and copy some key files onto the machine with WikipediaBase installed.
 ```Bash
-$ git clone https://github.com/michaelsilver/SeniorThesis.git
-$ cp SeniorThesis/createNetwork.py WikipediaBase/
-$ cp SeniorThesis/synonym_network.py WikipediaBase/
+$ git clone https://github.com/michaelsilver/Attribute-Analyzer.git
+$ cp Attribute-Analyzer/createNetwork.py WikipediaBase/
+$ cp Attribute-Analyzer/synonym_network.py WikipediaBase/
 ```
 You will also need to put `infoboxes.xlsx` in the `WikipediaBase` directory. If you have it on your computer, you can use `scp`. Syntax: `scp /path/to/file username@a:/path/to/destination`
 
@@ -31,7 +31,7 @@ Congratulations, you've now stolen all the data out of WikipediaBase that we nee
 
 4: Put a full clone of the repo on any machine of your choosing, and put `infoboxes.json`. This way you will be indipendant of WikipediaBase
 ```Bash
-$ git clone https://github.com/michaelsilver/SeniorThesis.git
+$ git clone https://github.com/michaelsilver/Attribute-Analyzer.git
 $ mkdir data/  # to structure the repo the way we need it
 $ scp username@remote-machine:/path/to/file ./data/  # put infoboxes.json where it needs to be
 $ python createNetwork.py
