@@ -1,11 +1,34 @@
+#!/usr/bin/env python2
+"""Create Network
+
+Creates Network of infobox attributes from saved JSON mappings. To
+generate mappings, use generateMappings.py
+
+Usage: python createNetwork.py [Input JSON Attribute Mappings] [Output
+File for Graph]
+
+This program is part of "Attribute Analyzer," a system to extract
+relationships from Wiki infobox attributes
+"""
+
+import sys
 import json
 import networkx as nx
 import synonym_network as sn
 # import matplotlib.pyplot as plt
 # import pydot
 
-def main():
-    with open('data/infoboxes.json', 'rb') as fp:
+def usage():
+    print __doc__
+
+def main(argv):
+    try:
+        mappingInput, graphOutput = argv[0], argv[1]
+    except IndexError:
+        usage()
+        sys.exit(2)
+
+    with open(mappingInput, 'rb') as fp:
         infoboxAttributes = json.load(fp)
         G=sn.SynonymNetwork()
         numberOfPairs = 0
@@ -41,7 +64,7 @@ def main():
                 
 
         print 'Saving graph...'
-        nx.write_gpickle(G,'data/attributeSynonyms.gpickle')
+        nx.write_gpickle(G, graphOutput)
         
         print 'DONE. Graphed a newtork of ' + str(G.number_of_nodes()) + ' nodes and ' + str(G.number_of_edges()) + ' edges from ' + str(numberOfPairs) + ' unrendered : rendered attribute pairs, spanning ' + str(len(infoboxAttributes.keys())) + ' infoboxes'
 
@@ -49,4 +72,5 @@ def main():
         # nx.draw(G,with_labels=True)
         # plt.show()
 
-main()
+if __name__ == "__main__":
+    main(sys.argv[1:])
