@@ -24,6 +24,7 @@ setup(
             'analyzeexplosion = attribute_analyzer.analyzeExplosion:main',
             'createnetwok = attribute_analyzer.createNetwork:main',
             'findempty = attribute_analyzer.findEmpty:main',
+            'names = attribute_analyzer.names:main',
         ],
     },
 
