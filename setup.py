@@ -25,6 +25,7 @@ setup(
             'createnetwok = attribute_analyzer.createNetwork:main',
             'findempty = attribute_analyzer.findEmpty:main',
             'names = attribute_analyzer.names:main',
+            'images = attribute_analyzer.images:main',
         ],
     },
 
