@@ -1,14 +1,14 @@
 import networkx as nx
 import collections
 
-class SynonymNetwork(nx.DiGraph):
+class WikiMap(nx.DiGraph):
     # CLASS MAINTENENCE:
     def __init__(self):
-        super(SynonymNetwork, self).__init__()
-        self.__undirectedCopy = super(SynonymNetwork, self).to_undirected() # undirected copy
+        super(WikiMap, self).__init__()
+        self.__undirectedCopy = super(WikiMap, self).to_undirected() # undirected copy
 
     def update_undirected(self):
-        self.__undirectedCopy = super(SynonymNetwork, self).to_undirected() # undirected copy
+        self.__undirectedCopy = super(WikiMap, self).to_undirected() # undirected copy
 
     def return_undirected(self):
         self.update_undirected()
@@ -16,7 +16,7 @@ class SynonymNetwork(nx.DiGraph):
 
     @classmethod
     def convert_to_special(cls, obj):
-        obj.__class__ = SynonymNetwork
+        obj.__class__ = WikiMap
         obj.update_undirected()
 
     # GENERAL NETWORK METHODS:
@@ -36,7 +36,7 @@ class SynonymNetwork(nx.DiGraph):
                 percent = round((100.00*v / numberOfGroups), 2)
                 print str(k) + ' nodes: ' + str(v) + ' (' + str(percent) + '%) groups'
             print '-----------------------------------------'
-            print 'TOTAL: ' + str(super(SynonymNetwork, self).number_of_nodes()) + ' nodes in network, ' + str(numberOfGroups) + ' distinct groups'
+            print 'TOTAL: ' + str(super(WikiMap, self).number_of_nodes()) + ' nodes in network, ' + str(numberOfGroups) + ' distinct groups'
         else:
             return lengthDict
 
@@ -44,7 +44,7 @@ class SynonymNetwork(nx.DiGraph):
         """Return a list of connected component of a given size"""
         components = [x for x in nx.connected_component_subgraphs(self.return_undirected()) if x.number_of_nodes() == size]
         for graph in components:
-            SynonymNetwork.convert_to_special(graph)
+            WikiMap.convert_to_special(graph)
 
         return components
 
@@ -57,7 +57,7 @@ class SynonymNetwork(nx.DiGraph):
     def infoboxes_of_graph(self):
         """Return a (non-redunant) list of a graph's infoboxes"""
         infoboxes = []
-        for nodeName in super(SynonymNetwork, self).nodes():
+        for nodeName in super(WikiMap, self).nodes():
             infoboxes = infoboxes + self.infoboxes_of_graph_node(nodeName)
         return list(set(infoboxes))
 
@@ -77,9 +77,9 @@ class SynonymNetwork(nx.DiGraph):
 
         graphsOfSize = self.connected_components_with_size(size)
         if showRending:
-            ans = [{node:graph.rendering_of_graph_node(node) for node in super(SynonymNetwork, graph).nodes()} for graph in graphsOfSize]
+            ans = [{node:graph.rendering_of_graph_node(node) for node in super(WikiMap, graph).nodes()} for graph in graphsOfSize]
         else:
-            ans = [super(SynonymNetwork, graph).nodes() for graph in graphsOfSize]
+            ans = [super(WikiMap, graph).nodes() for graph in graphsOfSize]
 
         if printResults:
             for x in ans:

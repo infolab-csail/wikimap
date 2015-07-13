@@ -2,7 +2,7 @@
 
 import argparse
 import networkx as nx
-import synonym_network as sn
+import wikimap
 import matplotlib.pyplot as plt
 
 def main():

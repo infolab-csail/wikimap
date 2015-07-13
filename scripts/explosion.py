@@ -15,7 +15,7 @@ import sys
 import json
 import operator
 import networkx as nx
-import synonym_network as sn
+import wikimap
 from xlrd import open_workbook
 
 def percentString(part, total):

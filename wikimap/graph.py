@@ -17,7 +17,7 @@ from unidecode import unidecode
 import re
 import string
 import networkx as nx
-import synonym_network as sn
+import wikimap
 
 badPunct = list(string.punctuation)
 badPunct.remove('_')            # will be dealt with separately (replaced with space)
@@ -78,7 +78,7 @@ def main():
 
     with open(args.mappings, 'rb') as fp:
         infoboxAttributes = json.load(fp)
-        G=sn.SynonymNetwork()
+        G=wikimap.WikiMap()
         numberOfPairs = 0
 
         for infobox, synonyms in infoboxAttributes.iteritems():

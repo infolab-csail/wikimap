@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 
 import networkx as nx
-import synonym_network as sn
+import wikimap
 from unidecode import unidecode
 
 def main():
