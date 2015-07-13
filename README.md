@@ -1,6 +1,8 @@
 # WikiMap
 Extract useful relationships from Wikipedia's Infobox attributes using mappings from Chris's [WikipediaBase](https://github.com/fakedrake/WikipediaBase). Work for the [CSAIL InfoLab](http://groups.csail.mit.edu/infolab/)
 
+_previously known as "Attribute Analyzer"_
+
 ## Generating an Infobox Attribute Graph
 How to extract unrendered ==> rendered mappings from Chris's WikipediaBase, and then create a network (or graph) such as this one:
 ![Alt text](/../master/images/keyPeople35.png?raw=true "Example Graph")
