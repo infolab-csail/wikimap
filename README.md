@@ -1,5 +1,7 @@
-# Attribute Analyzer
+# WikiMap
 Extract useful relationships from Wikipedia's Infobox attributes using mappings from Chris's [WikipediaBase](https://github.com/fakedrake/WikipediaBase). Work for the [CSAIL InfoLab](http://groups.csail.mit.edu/infolab/)
+
+_previously known as "Attribute Analyzer"_
 
 ## Generating an Infobox Attribute Graph
 How to extract unrendered ==> rendered mappings from Chris's WikipediaBase, and then create a network (or graph) such as this one:
@@ -51,11 +53,3 @@ Then you can do whatever you want with the graph now saved in the variable `G`; 
 >>> G.nodes()
 ```
 will print out all the nodes in the network.
-
-## Files
-File   	 | Description
--------- | -----------
-`allInfoboxAttributes.py` |  Loops through `infoboxes.xlsx` and creates a JSON dictionary (`infoboxes.json`) with all of the   `unrendered : rendered` attribute pairs, organized by infobox template name
-`findEmpty.py`  | Saves another JSON file with a list of `{"Template:Infobox <missed infobox1>" : # of pages, "Template:Infobox <missed infobox2>" : # of pages, … etc}` for infoboxes that `get_meta_infobox('<TEMPLATE_NAME>').rendered_keys()` returns `{}`
-`createNetwork.py` | Creates a network of unrendered and rendered infobox attributes in an attempt to identify synonyms. Each node is an attribute, and a directed edge links an unrendered to rendered attribute (in that direction).
-
