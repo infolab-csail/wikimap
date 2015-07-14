@@ -7,7 +7,7 @@ attributes, organized by infobox template.
 Usage: python generateMappings.py [Input Excel list of infobox templates] [Output
 JSON Attribute Mappings]
 
-This program is part of "Attribute Analyzer," a system to extract
+This program is part of "WikiMap," a system to extract
 relationships from Wiki infobox attributes
 """
 

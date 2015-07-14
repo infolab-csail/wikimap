@@ -7,7 +7,7 @@ generate mappings, use generateMappings.py
 Usage: python createNetwork.py [Input JSON Attribute Mappings] [Output
 File for Graph]
 
-This program is part of "Attribute Analyzer," a system to extract
+This program is part of "WikiMap," a system to extract
 relationships from Wiki infobox attributes
 """
 

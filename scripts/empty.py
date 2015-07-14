@@ -8,7 +8,7 @@ Usage: python findEmpty.py [Input JSON Attribute Mappings]
 [Input Excel list of infobox templates] [Output JSON list of
 infoboxes]
 
-This program is part of "Attribute Analyzer," a system to extract
+This program is part of "WikiMap," a system to extract
 relationships from Wiki infobox attributes
 """
 

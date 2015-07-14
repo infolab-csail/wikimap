@@ -1,1 +1,1 @@
-"Attribute analyzer"
+"WikiMap"
