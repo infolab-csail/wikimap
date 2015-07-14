@@ -1,13 +1,13 @@
 from setuptools import setup
 
 setup(
-    name='Attribute-Analyzer',
-    version='1.0',
+    name='wikimap',
+    version='0.1.0',
     description='Extract relationships from Wiki Infobox Attributes.',
     author='Michael Silver',
     author_email='msilver@csail.mit.edu',
-    url='https://github.com/michaelsilver/Attribute-Analyzer',
-    packages=['attribute_analyzer'],
+    url='https://github.com/michaelsilver/wikimap',
+    packages=['wikimap'],
     install_requires=[
         'xlrd',
         'networkx',
@@ -20,12 +20,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'allinfoboxattributes = attribute_analyzer.allInfoboxAttributes:main',
-            'analyzeexplosion = attribute_analyzer.analyzeExplosion:main',
-            'createnetwok = attribute_analyzer.createNetwork:main',
-            'findempty = attribute_analyzer.findEmpty:main',
-            'names = attribute_analyzer.names:main',
-            'images = attribute_analyzer.images:main',
+            'wikimap = wikimap.__main__:main',
         ],
     },
 
