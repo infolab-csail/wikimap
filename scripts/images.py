@@ -5,6 +5,7 @@ import networkx as nx
 import wikimap
 import matplotlib.pyplot as plt
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("graph", help="path to input network graph file")
@@ -20,7 +21,8 @@ def main():
         for idx, sub in enumerate(subGraphs):
             print "---- number " + str(idx + 1) + " ----"
             nx.draw(sub, with_labels=True, arrows=True)
-            plt.savefig(args.images + "len-" + str(len) + "-num-" + str(idx + 1) + ".png", bbox_inches="tight")
+            plt.savefig(args.images + "len-" + str(len) +
+                        "-num-" + str(idx + 1) + ".png", bbox_inches="tight")
         print "======================================="
 
 if __name__ == '__main__':

@@ -20,9 +20,12 @@ import networkx as nx
 import wikimap
 
 badPunct = list(string.punctuation)
-badPunct.remove('_')            # will be dealt with separately (replaced with space)
-badPunct.remove('-')            # will be dealt with separately (replaced with space)
-badPunct.remove("'")            # will be dealt with separately (checking for 's)
+# will be dealt with separately (replaced with space)
+badPunct.remove('_')
+# will be dealt with separately (replaced with space)
+badPunct.remove('-')
+# will be dealt with separately (checking for 's)
+badPunct.remove("'")
 badPunct.remove('%')            # "% of total exports"
 badPunct.remove(',')            # "Managing editor, design"
 badPunct.remove('$')            # "MSRP US$"
@@ -33,10 +36,12 @@ brackets = re.compile("\[.*?\]")
 parens = re.compile("\(.*?\)")
 noPossesive = re.compile("(?<!s)'(?!s)")
 
+
 def clean(node):
     node = unidecode(node)      # transliterate unicode
 
-    # leave the special '!!!!!' and 'File:' nodes alone, will be used as "bridges"
+    # leave the special '!!!!!' and 'File:' nodes alone, will be used as
+    # "bridges"
     if '!!!!!' not in node and 'File:' not in node:
         # strip all html, brackets, parens
         node = re.sub(html, '', node)
@@ -56,8 +61,9 @@ def clean(node):
             node = node.replace(punct, '')
 
         node = node.lower()           # lowercase
-        node = ' '.join(node.split()) # replace all multiple spaces with one
+        node = ' '.join(node.split())  # replace all multiple spaces with one
     return node
+
 
 def addToField(location, field, value):
     if (field in location.keys()) and (value not in location[field]):
@@ -65,11 +71,13 @@ def addToField(location, field, value):
     else:
         location[field] = [value]
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--clean", help="make graph with clean nodes",
-                    action="store_true")
-    parser.add_argument("mappings", help="path to input JSON list of infoboxes")
+                        action="store_true")
+    parser.add_argument(
+        "mappings", help="path to input JSON list of infoboxes")
     parser.add_argument("graph", help="path to output network graph file")
     # TODO:
     #   - add function to clean nodes when -c is passed
@@ -78,7 +86,7 @@ def main():
 
     with open(args.mappings, 'rb') as fp:
         infoboxAttributes = json.load(fp)
-        G=wikimap.WikiMap()
+        G = wikimap.WikiMap()
         numberOfPairs = 0
 
         for infobox, synonyms in infoboxAttributes.iteritems():
@@ -86,7 +94,8 @@ def main():
                 numberOfPairs += 1
 
                 if args.clean:
-                    cleanVersion = {node:clean(node) for node in (unrend, rend)}
+                    cleanVersion = {node: clean(node)
+                                    for node in (unrend, rend)}
                     for node in (unrend, rend):
                         G.add_node(cleanVersion[node])
                         addToField(G.node[cleanVersion[node]], 'was', node)
@@ -96,18 +105,24 @@ def main():
                 G.add_edge(unrend, rend)
 
                 # NODE ATTRIBUTES
-                rendState = 'unrend' # first deal with unrend
+                rendState = 'unrend'  # first deal with unrend
                 for node in (unrend, rend):
                     addToField(G.node[node], infobox, rendState)
-                    rendState = 'rend' # now we're dealing with rend
+                    rendState = 'rend'  # now we're dealing with rend
 
                 # EDGE ATTRIBUTES
                 addToField(G.edge[unrend][rend], 'infobox', infobox)
 
         print 'Saving graph...'
         nx.write_gpickle(G, args.graph)
-        
-        print 'DONE. Graphed a newtork of ' + str(G.number_of_nodes()) + ' nodes and ' + str(G.number_of_edges()) + ' edges from ' + str(numberOfPairs) + ' unrendered : rendered attribute pairs, spanning ' + str(len(infoboxAttributes.keys())) + ' infoboxes'
+
+        print "DONE. Graphed a newtork of {nodes} nodes and {edges} edges " \
+            "from {pairs} unrendered : rendered attribute pairs, spanning " \
+            "{infoboxes} infoboxes".format(
+                nodes=str(G.number_of_nodes()),
+                edges=str(G.number_of_edges()),
+                pairs=str(numberOfPairs),
+                infoboxes=str(len(infoboxAttributes.keys())))
 
         # print 'Showing graph now.'
         # nx.draw(G,with_labels=True)

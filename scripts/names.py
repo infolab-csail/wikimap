@@ -4,10 +4,10 @@ import networkx as nx
 import wikimap
 from unidecode import unidecode
 
+
 def main():
     G = nx.read_gpickle("data/attributeSynonyms.gpickle")
-    lengths = G.connected_component_statistics().keys()
-    lengths.sort()
+    lengths = sorted(G.connected_component_statistics().keys())
     for length in lengths:
         print "length " + str(length) + " node groups:"
         groups = G.connected_components_with_size(length)

@@ -18,8 +18,10 @@ import networkx as nx
 from wikimap import data, stats, wikimap
 from xlrd import open_workbook
 
+
 def usage():
     print __doc__
+
 
 def main(argv):
     try:
@@ -36,7 +38,8 @@ def main(argv):
     total_pages = data.total_pages(listInput)
 
     infobox_totals = data.get_infobox_totals(listInput)
-    infobox_pages = {name:total for name,total in infobox_totals.iteritems() if name in exploded_infoboxes}
+    infobox_pages = {name: total for name, total in infobox_totals.iteritems(
+    ) if name in exploded_infoboxes}
 
     total_missed_pages = sum(infobox_pages.values())
 
@@ -46,7 +49,11 @@ def main(argv):
     print
     print 'DONE. Statistics:'
 
-    print stats.fraction_msg("There are", total_missed_pages, total_pages, "Wikipedia pages in the explosion")
+    print stats.fraction_msg(
+        "There are",
+        total_missed_pages,
+        total_pages,
+        "Wikipedia pages in the explosion")
 
     print "In order, missed infoboxes with the most pages:"
     sortedInfoboxes = sorted(infobox_pages.items(), key=operator.itemgetter(1))
