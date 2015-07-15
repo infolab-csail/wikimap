@@ -14,10 +14,9 @@ relationships from Wiki infobox attributes
 
 import sys
 import json
+import operator
 from xlrd import open_workbook
-
-def percentString(part, total):
-    return str(round(100*float(part)/float(total),2)) + '%'
+from wikimap import data, stats
 
 def usage():
     print __doc__
@@ -29,40 +28,28 @@ def main(argv):
         usage()
         sys.exit(2)
 
-    with open(mappingInput, 'rb') as fp:
-        infoboxAttributes = json.load(fp)
-        emptyAttributes = {}
-        
-        wb = open_workbook(listInput)
-        sheet = wb.sheet_by_index(0)
+    mappings = data.get_mappings(mappingInput)
+    total_pages = data.total_pages(listInput)
 
-        totalPages = 0
-        totalMissedPages = 0
-        totalMissedTemplates = 0
-        mostMissedTemplate = 3596 # start with template with one page
-        
-        for row in range(2, sheet.nrows):        
-            cell = str(sheet.cell(row,0).value)
-            numberOfPages = sheet.cell(row,1).value # how many pages
-            totalPages += numberOfPages
-            infobox = 'Template:Infobox ' + cell.replace('-', ' ')
-            print 'Checking ' + str(row) + ' of ' + str(sheet.nrows) + " : " + infobox
-            if infoboxAttributes[infobox] == {}:
-                emptyAttributes[infobox] = numberOfPages
-                totalMissedPages += numberOfPages
-                totalMissedTemplates += 1
-                if numberOfPages > sheet.cell(mostMissedTemplate,1).value:
-                    mostMissedTemplate = row
+    infobox_totals = data.get_infobox_totals(listInput)
+    total_infoboxes = data.total_infoboxes(listInput)
+    empty_attributes = {name:total for name,total in infobox_totals.iteritems() if mappings[name] == {}}
 
-        print 'Done. Writing to disk...'
-        with open(infoboxOutput, 'wb') as fp:
-            json.dump(emptyAttributes, fp)
+    total_missed_pages = sum(empty_attributes.values())
+    total_missed_templates = len(empty_attributes)
+    most_missed_template = max(empty_attributes.iteritems(), key=operator.itemgetter(1))[0] # key for max value
 
-        print
-        print 'DONE. Statistics:'
-        print 'Total number of missed infobox templates: ' + str(totalMissedTemplates) + ' out of ' + str(sheet.nrows - 2) + ' total, or ' + percentString(totalMissedTemplates, sheet.nrows - 2)
-        print 'This misses ' + str(int(totalMissedPages)) + ' Wikipedia pages out of ' + str(int(totalPages)) + ' total, or ' + percentString(totalMissedPages, totalPages)
-        print 'Missed template with most pages: ' + '[Template:Infobox ' + str(sheet.cell(mostMissedTemplate,0).value).replace('-', ' ') + '] with ' + str(int(sheet.cell(mostMissedTemplate,1).value)) + ' pages'
+    print 'Done. Writing to disk...'
+    data.write_json(empty_attributes, infoboxOutput)
+
+    print
+    print 'DONE. Statistics:'
+
+    print stats.fraction_msg("Missing", total_missed_templates, total_infoboxes, "Infobox templates")
+
+    print stats.fraction_msg("Missing", total_missed_pages, total_pages, "Wikipedia pages")
+
+    print "Missed template with most pages: [{template}] with {number} pages".format(template=most_missed_template, number=str(empty_attributes[most_missed_template]))
 
 if __name__ == "__main__":
     main(sys.argv[1:])

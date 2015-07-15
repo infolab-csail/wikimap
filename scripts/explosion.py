@@ -15,11 +15,8 @@ import sys
 import json
 import operator
 import networkx as nx
-import wikimap
+from wikimap import data, stats, wikimap
 from xlrd import open_workbook
-
-def percentString(part, total):
-    return str(round(100*float(part)/float(total),2)) + '%'
 
 def usage():
     print __doc__
@@ -31,37 +28,30 @@ def main(argv):
         usage()
         sys.exit(2)
 
-    G = nx.read_gpickle(graphInput)
-    maxGraph = G.connected_components_with_size(max(G.connected_component_lengths()))[0]
-    explodedInfoboxes = maxGraph.infoboxes_of_graph()
-    
-    wb = open_workbook(listInput)
-    sheet = wb.sheet_by_index(0)
+    G = data.read_graph(graphInput)
+    max_size = max(G.connected_component_lengths())
+    max_graph = G.connected_components_with_size(max_size)[0]
+    exploded_infoboxes = max_graph.infoboxes_of_graph()
 
-    totalPages = 0
-    totalMissedPages = 0
-    infoboxPages = {}
+    total_pages = data.total_pages(listInput)
 
-    for row in range(2, sheet.nrows):        
-        cell = str(sheet.cell(row,0).value)
-        numberOfPages = int(sheet.cell(row,1).value) # how many pages
-        totalPages += numberOfPages
-        infobox = 'Template:Infobox ' + cell.replace('-', ' ')
-        # print 'Loading  ' + str(row) + ' of ' + str(sheet.nrows) + " : " + infobox
-        if infobox in explodedInfoboxes: 
-            infoboxPages[infobox] = numberOfPages
-            totalMissedPages += numberOfPages
-    
+    infobox_totals = data.get_infobox_totals(listInput)
+    infobox_pages = {name:total for name,total in infobox_totals.iteritems() if name in exploded_infoboxes}
+
+    total_missed_pages = sum(infobox_pages.values())
+
     print 'Done. Writing to disk...'
-    with open(infoboxOutput, 'wb') as fp:
-        json.dump(infoboxPages, fp)
+    data.write_json(infobox_pages, infoboxOutput)
 
     print
     print 'DONE. Statistics:'
-    print 'This misses ' + str(int(totalMissedPages)) + ' Wikipedia pages out of ' + str(int(totalPages)) + ' total, or ' + percentString(totalMissedPages, totalPages)
-    print 'In order, missed infoboxes with the most pages:'
-    sortedInfoboxes = sorted(infoboxPages.items(), key=operator.itemgetter(1))
-    for x in sortedInfoboxes: print x
+
+    print stats.fraction_msg("There are", total_missed_pages, total_pages, "Wikipedia pages in the explosion")
+
+    print "In order, missed infoboxes with the most pages:"
+    sortedInfoboxes = sorted(infobox_pages.items(), key=operator.itemgetter(1))
+    for x in sortedInfoboxes:
+        print x
 
 if __name__ == "__main__":
     main(sys.argv[1:])

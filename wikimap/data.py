@@ -1,12 +1,16 @@
 import itertools
 import json
 from xlrd import open_workbook
+import networkx as nx
 
 ### INPUT ###
 # add caching decorator
 def read_json(path):
     with open(path, 'rb') as fp:
         return json.load(fp)
+
+def read_graph(path):
+    return nx.read_gpickle(path)
 
 # add caching decorator
 def get_infobox_totals(path):
