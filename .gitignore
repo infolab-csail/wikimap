@@ -1,4 +1,4 @@
 *.pyc
 *egg-info
-attribute_analyzer/data/*
-!attribute_analyzer/data/*.xlsx
+*/data/*
+!*/data/*.xlsx

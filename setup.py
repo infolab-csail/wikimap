@@ -7,7 +7,10 @@ setup(
     author='Michael Silver',
     author_email='msilver@csail.mit.edu',
     url='https://github.com/michaelsilver/wikimap',
-    packages=['wikimap'],
+    packages=[
+        'wikimap',
+        'tests'
+    ],
     install_requires=[
         'xlrd',
         'networkx',
@@ -18,10 +21,15 @@ setup(
         # until this gets deployed
         'git+https://github.com/fakedrake/wikipediabase.git#egg=wikipediabase'
     ],
+    tests_require=[
+        'mock',
+        'nose>=1.0',
+        'funcsigs'              # pip forced me to install this
+    ],
     entry_points={
         'console_scripts': [
             'wikimap = wikimap.__main__:main',
         ],
     },
-
+    test_suite='nose.collector',
 )

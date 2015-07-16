@@ -1,7 +1,10 @@
 import unittest
 import mock
 import os.path
+import networkx
+import json
 from wikimap import data
+import __builtin__
 
 
 # DISCLAIMER: many of these tests are of functions that are light
@@ -16,7 +19,7 @@ class TestReading(unittest.TestCase):
     def test_read_graph(self):
         # read_graph() is a bare-bone wrapper around
         # nx.read_gpickle(), so this test is a little silly
-        with mock.patch('nx.read_gpickle') as mock_read:
+        with mock.patch('networkx.read_gpickle') as mock_read:
             fake_graph = "graph"
             fake_path = "path/to/dest"
             mock_read.return_value = fake_graph
@@ -31,10 +34,10 @@ class TestReading(unittest.TestCase):
 
             # when I call read_graph() with fake_path, does
             # nx.read_gpickle() get called with the same path?
-            nx.read_gpickle.assert_called_once_with(fake_path)
+            networkx.read_gpickle.assert_called_once_with(fake_path)
 
     def test_get_infobox_totals(self):
-        path = "fake_data/test_infoboxes.xlsx"
+        path = "tests/fake_data/test_infoboxes.xlsx"
         returned = data.get_infobox_totals(path)
         expected = {"Template:Infobox settlement": 354090,
                     "Template:Infobox person": 146915,
@@ -52,12 +55,12 @@ class TestJSON(unittest.TestCase):
 
     def setUp(self):
         # set up mock of open()
-        patcher = mock.patch('open')
+        patcher = mock.patch('__builtin__.open')
         self.addCleanup(patcher.stop)
         patcher.start()
-        fake_file_object = 100
-        fake_path = "path/to/dest"
-        patcher.return_value = fake_file_object
+        self.fake_file_object = 100
+        self.fake_path = "path/to/dest"
+        patcher.return_value = self.fake_file_object
 
     def test_write_json(self):
         # write_json() depends on open() and json.dump(), so we are
@@ -68,16 +71,16 @@ class TestJSON(unittest.TestCase):
                          "Template:Infobox album": 122492,
                          "Template:Infobox football biography": 118713,
                          "Template:Infobox 2011": 5}
-            data.write_json(fake_data, fake_path)
+            data.write_json(fake_data, self.fake_path)
 
             # assume open() returns fake_file_object, does json.dump()
             # get called with the arguments I expect? If so, I trust
             # that json.dump is well tested already.
-            json.dump.assert_called_once_with(fake_data, fake_file_object)
+            json.dump.assert_called_once_with(fake_data, self.fake_file_object)
 
             # makes sure write_json() is calling open() correctly,
             # otherwise we can't assume open() returns a valid result
-            open.assert_called_once_with(fake_path, 'wb')
+            __builtin__.open.assert_called_once_with(self.fake_path, 'wb')
 
     def test_read_json(self):
         # write_json() depends on open() and json.load(), so we are
@@ -90,7 +93,7 @@ class TestJSON(unittest.TestCase):
                          "Template:Infobox 2011": 5}
             mock_load.return_value = fake_data
 
-            returned = data.read_json(fake_path)
+            returned = data.read_json(self.fake_path)
             expected = fake_data
 
             # assume open() and write_json() work, does read_json()
@@ -100,48 +103,48 @@ class TestJSON(unittest.TestCase):
             # assume open() returns fake_file_object, does json.load()
             # get called with the arguments I expect? If so, I trust
             # that json.load is well tested already.
-            json.load.assert_called_once_with(fake_file_object)
+            json.load.assert_called_once_with(self.fake_file_object)
 
             # makes sure write_json() is calling open() correctly,
             # otherwise we can't assume open() returns a valid result
-            open.assert_called_once_with(fake_path, 'rb')
+            __builtin__.open.assert_called_once_with(self.fake_path, 'rb')
 
 
 class TestDependantInfoboxData(unittest.TestCase):
 
     def setUp(self):
         # set up mock of get_infobox_totals()
-        patcher = mock.patch('get_infobox_totals')
+        patcher = mock.patch('wikimap.data.get_infobox_totals')
         self.addCleanup(patcher.stop)
         patcher.start()
-        fake_data = {"Template:Infobox settlement": 354090,
+        self.fake_data = {"Template:Infobox settlement": 354090,
                      "Template:Infobox person": 146915,
                      "Template:Infobox album": 122492,
                      "Template:Infobox football biography": 118713,
                      "Template:Infobox 2011": 5}
-        fake_path = "path/to/dest"
-        patcher.return_value = fake_data
+        self.fake_path = "path/to/dest"
+        patcher.return_value = self.fake_data
 
     def test_mock_get_infobox_totals(self):
         # makes sure that mock of get_infobox_totals() is working as I
         # expect
 
-        returned = get_infobox_totals(fake_path)
-        expected = fake_data
+        returned = data.get_infobox_totals(self.fake_path)
+        expected = self.fake_data
 
         # Does get_infobox_totals() return what I expect? Otherwise,
         # the tests below are not reliable
-        self.assertEqual(result, expected)
+        self.assertEqual(returned, expected)
 
         # Test that assert_called_once_with() returns my arguments,
         # otherwise the below tests are not reliable
-        get_infobox_totals.assert_called_once_with(fake_path)
+        get_infobox_totals.assert_called_once_with(self.fake_path)
 
     def test_get_infoboxes(self):
         # get_infoboxes() depends on get_infobox_totals(), so we are
         # mocking get_infobox_totals() in this test
 
-        returned = data.get_infoboxes(fake_path)
+        returned = data.get_infoboxes(self.fake_path)
         expected = ["Template:Infobox settlement",
                     "Template:Infobox person",
                     "Template:Infobox album",
@@ -155,13 +158,13 @@ class TestDependantInfoboxData(unittest.TestCase):
         # makes sure get_infoboxes() is calling get_infobox_totals()
         # correctly, otherwise we can't assume get_infobox_totals()
         # returns a valid result
-        get_infobox_totals.assert_called_once_with(fake_path)
+        get_infobox_totals.assert_called_once_with(self.fake_path)
 
     def test_total_infoboxes(self):
         # total_infoboxes() depends on get_infobox_totals(), so we are
         # mocking get_infobox_totals() in this test
 
-        returned = data.total_infoboxes(fake_path)
+        returned = data.total_infoboxes(self.fake_path)
         expected = 5
 
         # assume get_infobox_totals() returns valid result, does
@@ -171,13 +174,13 @@ class TestDependantInfoboxData(unittest.TestCase):
         # makes sure total_infoboxes() is calling get_infobox_totals()
         # correctly, otherwise we can't assume get_infobox_totals()
         # returns a valid result
-        get_infobox_totals.assert_called_once_with(fake_path)
+        get_infobox_totals.assert_called_once_with(self.fake_path)
 
     def test_total_pages(self):
         # total_pages() depends on get_infobox_totals(), so we are
         # mocking get_infobox_totals() in this test
 
-        returned = data.total_infoboxes(fake_path)
+        returned = data.total_infoboxes(self.fake_path)
         expected = 354090 + 146915 + 122492 + 118713 + 5
 
         # assume get_infobox_totals() returns valid result, does
@@ -187,4 +190,4 @@ class TestDependantInfoboxData(unittest.TestCase):
         # makes sure total_pages() is calling get_infobox_totals()
         # correctly, otherwise we can't assume get_infobox_totals()
         # returns a valid result
-        get_infobox_totals.assert_called_once_with(fake_path)
+        get_infobox_totals.assert_called_once_with(self.fake_path)
