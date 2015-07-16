@@ -4,7 +4,7 @@ from xlrd import open_workbook
 import networkx as nx
 
 
-# INPUT
+# READING
 
 # add caching decorator
 def read_json(path):
@@ -45,7 +45,7 @@ def total_pages(path):
     return sum(infobox_pages(path).values())
 
 
-# OUTPUT
+# WRITING
 
 def write_json(dict, path):
     with open(path, 'wb') as fp:
