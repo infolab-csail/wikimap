@@ -32,7 +32,7 @@ def get_infobox_totals(path):
 
 # add caching decorator
 def get_infoboxes(path):
-    return infobox_pages(path).keys()
+    return get_infobox_totals(path).keys()
 
 
 # add caching decorator
@@ -42,7 +42,7 @@ def total_infoboxes(path):
 
 # add caching decorator
 def total_pages(path):
-    return sum(infobox_pages(path).values())
+    return sum(get_infobox_totals(path).values())
 
 
 # WRITING
