@@ -39,11 +39,11 @@ class TestReading(unittest.TestCase):
     def test_get_infobox_totals(self):
         path = "tests/fake_data/test_infoboxes.xlsx"
         returned = data.get_infobox_totals(path)
-        expected = {"Template:Infobox settlement": 354090,
-                    "Template:Infobox person": 146915,
-                    "Template:Infobox album": 122492,
-                    "Template:Infobox football biography": 118713,
-                    "Template:Infobox 2011": 5}
+        expected = {"Template:Infobox settlement": 354090.0,
+                    "Template:Infobox person": 146915.0,
+                    "Template:Infobox album": 122492.0,
+                    "Template:Infobox football biography": 118713.0,
+                    "Template:Infobox 2011": 5.0}
         self.assertEqual(returned, expected)
 
         # test that the dependant file exists, otherwise the assertion
@@ -66,11 +66,11 @@ class TestJSON(unittest.TestCase):
         # write_json() depends on open() and json.dump(), so we are
         # mocking both in this test.
         with mock.patch('json.dump') as mock_dump:
-            fake_data = {"Template:Infobox settlement": 354090,
-                         "Template:Infobox person": 146915,
-                         "Template:Infobox album": 122492,
-                         "Template:Infobox football biography": 118713,
-                         "Template:Infobox 2011": 5}
+            fake_data = {"Template:Infobox settlement": 354090.0,
+                         "Template:Infobox person": 146915.0,
+                         "Template:Infobox album": 122492.0,
+                         "Template:Infobox football biography": 118713.0,
+                         "Template:Infobox 2011": 5.0}
             data.write_json(fake_data, self.fake_path)
 
             # assume open() returns fake_file_object, does json.dump()
@@ -86,11 +86,11 @@ class TestJSON(unittest.TestCase):
         # write_json() depends on open() and json.load(), so we are
         # mocking both in this test.
         with mock.patch('json.load') as mock_load:
-            fake_data = {"Template:Infobox settlement": 354090,
-                         "Template:Infobox person": 146915,
-                         "Template:Infobox album": 122492,
-                         "Template:Infobox football biography": 118713,
-                         "Template:Infobox 2011": 5}
+            fake_data = {"Template:Infobox settlement": 354090.0,
+                         "Template:Infobox person": 146915.0,
+                         "Template:Infobox album": 122492.0,
+                         "Template:Infobox football biography": 118713.0,
+                         "Template:Infobox 2011": 5.0}
             mock_load.return_value = fake_data
 
             returned = data.read_json(self.fake_path)
@@ -117,11 +117,11 @@ class TestDependantInfoboxData(unittest.TestCase):
         patcher = mock.patch('wikimap.data.get_infobox_totals')
         self.addCleanup(patcher.stop)
         patcher.start()
-        self.fake_data = {"Template:Infobox settlement": 354090,
-                     "Template:Infobox person": 146915,
-                     "Template:Infobox album": 122492,
-                     "Template:Infobox football biography": 118713,
-                     "Template:Infobox 2011": 5}
+        self.fake_data = {"Template:Infobox settlement": 354090.0,
+                     "Template:Infobox person": 146915.0,
+                     "Template:Infobox album": 122492.0,
+                     "Template:Infobox football biography": 118713.0,
+                     "Template:Infobox 2011": 5.0}
         self.fake_path = "path/to/dest"
         patcher.return_value = self.fake_data
 
@@ -181,7 +181,7 @@ class TestDependantInfoboxData(unittest.TestCase):
         # mocking get_infobox_totals() in this test
 
         returned = data.total_infoboxes(self.fake_path)
-        expected = 354090 + 146915 + 122492 + 118713 + 5
+        expected = 354090.0 + 146915.0 + 122492.0 + 118713.0 + 5.0
 
         # assume get_infobox_totals() returns valid result, does
         # total_pages() return what I expect?
