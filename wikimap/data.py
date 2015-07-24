@@ -43,19 +43,34 @@ def get_infobox_totals(path):
     return dict(itertools.izip(formal_names, numbers))
 
 
-# add caching decorator
+# get_infoboxes()
+def _get_infoboxes(infobox_totals):
+    return infobox_totals.keys()
+
+
+# TODO: add caching decorator
 def get_infoboxes(path):
-    return get_infobox_totals(path).keys()
+    _get_infoboxes(get_infobox_totals(path))
 
 
-# add caching decorator
+# total_infoboxes()
+def _total_infoboxes(infobox_totals):
+    return len(infobox_totals)
+
+
+# TODO: add caching decorator
 def total_infoboxes(path):
-    return len(get_infobox_totals(path))
+    _total_infoboxes(get_infobox_totals(path))
 
 
-# add caching decorator
+# total_pages()
+def _total_pages(infobox_totals):
+    return sum(infobox_totals.values())
+
+
+# TODO: add caching decorator
 def total_pages(path):
-    return sum(get_infobox_totals(path).values())
+    _total_pages(get_infobox_totals(path))
 
 
 # WRITING

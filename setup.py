@@ -1,4 +1,5 @@
 from setuptools import setup
+import multiprocessing
 
 setup(
     name='wikimap',
@@ -22,7 +23,6 @@ setup(
         'git+https://github.com/fakedrake/wikipediabase.git#egg=wikipediabase'
     ],
     tests_require=[
-        'mock',
         'nose>=1.0',
         'funcsigs'              # pip forced me to install this
     ],
