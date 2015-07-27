@@ -20,3 +20,16 @@ def fraction_msg(msg, missed, total, thing):
             int(missed)), thing=thing, total=str(
             int(total)), percent=percent_str(
                 missed, total))
+
+
+def dict_sublength(nest_dict):
+    """Returns the sum of all the lengths of one level nested dicts, e.g.
+    food_colors = {'fruit': {'orange': 'orange',
+                             'apple': 'red',
+                             'banana': 'yellow'},
+                   'vegetables': {'lettuce': 'green',
+                                  'beet': 'red',
+                                  'pumpkin': 'orange'}}
+    will return 6
+    """
+    return sum(len(v) for v in nest_dict.itervalues())
