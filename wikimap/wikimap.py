@@ -1,8 +1,30 @@
 import networkx as nx
 import collections
+from unidecode import unidecode
+import re
+import string
 
 
 class WikiMap(nx.DiGraph):
+
+    bad_punct = list(string.punctuation)
+    # will be dealt with separately (replaced with space)
+    bad_punct.remove('_')
+    # will be dealt with separately (replaced with space) -- actually
+    # experimenting with leaving the dash there
+    bad_punct.remove('-')
+    # will be dealt with separately (checking for 's)
+    bad_punct.remove("'")
+    bad_punct.remove('%')            # "% of total exports"
+    bad_punct.remove(',')            # "Managing editor, design"
+    bad_punct.remove('$')            # "MSRP US$"
+    bad_punct.remove('&')            # "Specific traits & abilities"
+
+    html = re.compile("<.*?>")
+    brackets = re.compile("\[.*?\]")
+    parens = re.compile("\(.*?\)")
+    no_possesive = re.compile("(?<!s)'(?!s)")
+
     # CLASS MAINTENENCE:
 
     def __init__(self):
@@ -62,6 +84,8 @@ class WikiMap(nx.DiGraph):
         return components
 
     # SPECIFIC WIKI INFOBOX/ATTRIBUTE METHODS:
+
+    # FETCHING INFORMATION
     def infoboxes_of_graph_node(self, nodeName):
         """Return a list of infoboxes of a node"""
         return self.node[nodeName].keys()
@@ -85,6 +109,71 @@ class WikiMap(nx.DiGraph):
             return 'rend'
         else:
             return 'mixed'
+
+    # INSERTING INFORMATION
+    @staticmethod
+    def clean(node):
+        if isinstance(node, unicode):
+            node = unidecode(node)      # transliterate unicode
+
+        # leave the special '!!!!!' and 'File:' nodes alone, will be used as
+        # "bridges"
+        if '!!!!!' not in node and 'File:' not in node:
+            # strip all html, brackets, parens
+            node = re.sub(WikiMap.html, '', node)
+            node = re.sub(WikiMap.brackets, '', node)
+            node = re.sub(WikiMap.parens, '', node)
+            node = node.replace('&mdot;', '')
+
+            # check for possessive ('s or s' or s's); if none, strip all '
+            node = re.sub(WikiMap.no_possesive, '', node)
+
+            # replace all dashes and underscores with a space
+            node = node.replace('_', ' ')
+            # node = node.replace('-', ' ')
+
+            # strip all remaining punctuation
+            for punct in WikiMap.bad_punct:
+                node = node.replace(punct, '')
+
+            node = node.lower()           # lowercase
+            node = ' '.join(node.split())  # replace all multiple spaces with one
+        return node
+
+    @staticmethod
+    def add_to_field(location, field, value):
+        if (field in location.keys()) and (value not in location[field]):
+            location[field].append(value)
+        else:
+            location[field] = [value]
+
+    def add_uncleaned(self, unrend, rend):
+        for node in (unrend, rend):
+            clean_node = clean(node)
+            self.add_node(clean_node)
+            add_to_field(self.node[clean_node], 'was', node)
+
+    def add_rendering(self, unrend, rend):
+        rend_state = 'unrend'  # first deal with unrend
+        for node in (unrend, rend):
+            add_to_field(self.node[node], infobox, rendState)
+            rend_state = 'rend'  # now we're dealing with rend
+
+    def add_infobox(self, infobox, unrend, rend):
+        add_to_field(self.edge[unrend][rend], 'infobox', infobox)
+
+    def add_mapping(self, infobox, unrend, rend, clean):
+        """Add mapping for [infobox] (str) between [unrendered] (str) and
+        [rendered] (str) to the specified [graph] (WikiMap object)"""
+        if clean:
+            self.add_uncleaned(unrend, rend)
+            unrend = clean(unrend)
+            rend = clean(rend)
+
+        self.add_edge(unrend, rend)
+
+        self.add_rendering(unrend, rend)
+        self.add_infobox(infobox, unrend, rend)
 
     # ANALYTICS:
     def connected_component_nodes_with_size(
