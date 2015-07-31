@@ -75,7 +75,9 @@ class WikiMap(nx.DiGraph):
             return lengthDict
 
     def connected_components_with_size(self, size):
-        """Return a list of connected component of a given size"""
+        """Return a list of connected component of a given size
+        WARNING: directionality of graph lost in process
+        """
         components = [x for x in nx.connected_component_subgraphs(
             self.return_undirected()) if x.number_of_nodes() == size]
         for graph in components:

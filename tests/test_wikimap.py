@@ -33,7 +33,6 @@ class TestGeneralNetworkMethods(unittest.TestCase):
         self.assertItemsEqual(
             self.G.connected_component_statistics(), {2: 1, 3: 2, 4: 1})
 
-    @unittest.expectedFailure
     def test_connected_components_with_size(self):
         # three node group
         expected_three1 = wikimap.WikiMap()
@@ -48,8 +47,12 @@ class TestGeneralNetworkMethods(unittest.TestCase):
         # four node group
         expected_four = wikimap.WikiMap()
         expected_four.add_edge("A", "B")
+        expected_four.add_edge("B", "A")
         expected_four.add_edge("A", "C")
+        expected_four.add_edge("C", "A")
         expected_four.add_edge("D", "C")
+        expected_four.add_edge("C", "D")
+        # because directionality of graph lost in process
 
         self.assertEqual(len(self.G.connected_components_with_size(3)),
                          len([expected_three1, expected_three2]))
