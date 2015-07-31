@@ -155,13 +155,36 @@ class TestInsertingInformation(unittest.TestCase):
         self.assertEqual(self.G.node['unrend']['was'], ['_unrend_', '#unrend#'])
         self.assertEqual(self.G.node['rend']['was'], ['_rend_'])
 
-    def test_add_rendering(self):
-        self.G.add_edge('unrend', 'rend')
+    def test_add_rendering_no_both(self):
+        self.G.add_edge('unrend', 'hybrid')
+        self.G.add_edge('hybrid', 'rend')
 
-        self.G.add_rendering('Infobox foo bar', 'unrend', 'rend')
+        self.G.add_rendering('Infobox foo bar', 'unrend', 'hybrid')
+        self.G.add_rendering('Infobox baz bang', 'hybrid', 'rend')
 
         self.assertEqual(self.G.node['unrend']['infobox'],
                          {'Infobox foo bar': ['unrend']})
+
+        self.assertEqual(self.G.node['hybrid']['infobox'],
+                         {'Infobox foo bar': ['rend'],
+                          'Infobox baz bang': ['unrend']})
+
+        self.assertEqual(self.G.node['rend']['infobox'],
+                         {'Infobox baz bang': ['rend']})
+
+    def test_add_rendering_with_both(self):
+        self.G.add_edge('unrend', 'hybrid')
+        self.G.add_edge('hybrid', 'rend')
+
+        self.G.add_rendering('Infobox foo bar', 'unrend', 'hybrid')
+        self.G.add_rendering('Infobox foo bar', 'hybrid', 'rend')
+
+        self.assertEqual(self.G.node['unrend']['infobox'],
+                         {'Infobox foo bar': ['unrend']})
+
+        self.assertItemsEqual(self.G.node['hybrid']['infobox'],
+                         {'Infobox foo bar': ['unrend', 'rend']})
+
         self.assertEqual(self.G.node['rend']['infobox'],
                          {'Infobox foo bar': ['rend']})
 

@@ -154,12 +154,16 @@ class WikiMap(nx.DiGraph):
             self.add_node(clean_node)
             WikiMap.add_to_field(self.node[clean_node], 'was', node)
 
+    def _add_node_rendering(self, infobox, node, rend_state):
+        if 'infobox' not in self.node[node].keys():
+            self.node[node]['infobox'] = {}
+        WikiMap.add_to_field(
+            self.node[node]['infobox'], infobox, rend_state)
+
     def add_rendering(self, infobox, unrend, rend):
         rend_state = 'unrend'  # first deal with unrend
         for node in (unrend, rend):
-            self.node[node]['infobox'] = {}
-            WikiMap.add_to_field(
-                self.node[node]['infobox'], infobox, rend_state)
+            self._add_node_rendering(infobox, node, rend_state)
             rend_state = 'rend'  # now we're dealing with rend
 
     def add_infobox(self, infobox, unrend, rend):
