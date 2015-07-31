@@ -148,10 +148,11 @@ class TestInsertingInformation(unittest.TestCase):
 
     def test_add_uncleaned(self):
         self.G.add_uncleaned('_unrend_', '_rend_')
+        self.G.add_uncleaned('#unrend#', '_rend_')
 
         self.assertItemsEqual(self.G.nodes(), ['unrend', 'rend'])
 
-        self.assertEqual(self.G.node['unrend']['was'], ['_unrend_'])
+        self.assertEqual(self.G.node['unrend']['was'], ['_unrend_', '#unrend#'])
         self.assertEqual(self.G.node['rend']['was'], ['_rend_'])
 
     def test_add_rendering(self):
