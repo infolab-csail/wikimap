@@ -192,9 +192,10 @@ class TestInsertingInformation(unittest.TestCase):
         self.G.add_edge('unrend', 'rend')
 
         self.G.add_infobox('Infobox foo bar', 'unrend', 'rend')
+        self.G.add_infobox('Infobox baz bang', 'unrend', 'rend')
 
-        self.assertEqual(self.G.edge['unrend']['rend']['infobox'],
-                         ['Infobox foo bar'])
+        self.assertItemsEqual(self.G.edge['unrend']['rend']['infobox'],
+                         ['Infobox foo bar', 'Infobox baz bang'])
 
     def test_add_mapping_no_clean(self):
         self.G.add_mapping('Infobox foo bar', 'unrend', 'rend', False)
