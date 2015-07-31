@@ -208,7 +208,16 @@ class TestInsertingInformation(unittest.TestCase):
 # class TestFetchingInformation(unittest.TestCase):
 
 #     def setUp(self):
+#         self.G = wikimap.WikiMap()
+#         self.G.add_edge('unrend', 'rend')
 
+#         self.G.node['unrend']['was'] = ['_unrend_']
+#         self.G.node['rend']['was'] = ['_rend_']
+
+#         self.G.node['unrend']['infobox'] = {'Infobox foo bar': ['unrend']}
+#         self.G.node['rend']['infobox'] = {'Infobox foo bar': ['rend']}
+
+#         self.G.edge['unrend']['rend']['infobox'] = ['Infobox foo bar']
 
 #     def test_infoboxes_of_graph_node(self):
 #         # stub
