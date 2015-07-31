@@ -1,6 +1,7 @@
 import unittest
 from wikimap import wikimap
 import networkx.testing as nxt
+import networkx as nx
 
 
 class TestGeneralNetworkMethods(unittest.TestCase):
@@ -25,10 +26,12 @@ class TestGeneralNetworkMethods(unittest.TestCase):
         self.G.add_edge("M", "N")
 
     def test_connected_component_lengths(self):
-        self.assertItemsEqual(self.G.connected_component_lengths(), [2, 3, 3, 4])
+        self.assertItemsEqual(
+            self.G.connected_component_lengths(), [2, 3, 3, 4])
 
     def test_connected_component_statistics(self):
-        self.assertEqual(self.G.connected_component_statistics(), {2:1, 3:2, 4:1})
+        self.assertEqual(
+            self.G.connected_component_statistics(), {2: 1, 3: 2, 4: 1})
 
     @unittest.expectedFailure
     def test_connected_components_with_size(self):
@@ -49,7 +52,7 @@ class TestGeneralNetworkMethods(unittest.TestCase):
         expected_four.add_edge("D", "C")
 
         self.assertEqual(len(self.G.connected_components_with_size(3)),
-                              len([expected_three1, expected_three2]))
+                         len([expected_three1, expected_three2]))
         # unfortunately cannot test that two lists of graphs are
         # equal, so only test length of lists here, and then that the
         # graph in the list of len=1 below is equal. Hopefully this is
@@ -59,18 +62,22 @@ class TestGeneralNetworkMethods(unittest.TestCase):
         nxt.assert_graphs_equal(returned_four, expected_four)
 
 
-class TestCleaningNodes(unittest.TestCase): 
+class TestCleaningNodes(unittest.TestCase):
+
     def test_clean_skips(self):
         self.assertEqual(wikimap.WikiMap.clean("File: foo"), "File: foo")
-        self.assertEqual(wikimap.WikiMap.clean("!!!!!foo!!!!!"), "!!!!!foo!!!!!")
+        self.assertEqual(
+            wikimap.WikiMap.clean("!!!!!foo!!!!!"), "!!!!!foo!!!!!")
 
     def test_clean_unicode(self):
-        self.assertEqual(wikimap.WikiMap.clean(u'Rate\xa0of\xa0fire'), "rate of fire")
+        self.assertEqual(
+            wikimap.WikiMap.clean(u'Rate\xa0of\xa0fire'), "rate of fire")
 
     def test_clean_punct_remove(self):
         # capitalization and punctuation removal
         self.assertEqual(wikimap.WikiMap.clean("Heights"), "heights")
-        self.assertEqual(wikimap.WikiMap.clean("discovery_site"), "discovery site")
+        self.assertEqual(
+            wikimap.WikiMap.clean("discovery_site"), "discovery site")
         self.assertEqual(wikimap.WikiMap.clean("Max. devices"), "max devices")
         self.assertEqual(wikimap.WikiMap.clean("Circus tent?"), "circus tent")
         self.assertEqual(wikimap.WikiMap.clean("Web site:"), "web site")
@@ -95,16 +102,22 @@ class TestCleaningNodes(unittest.TestCase):
         self.assertEqual(wikimap.WikiMap.clean("Opened</th>"), "opened")
 
     def test_clean_parens(self):
-        self.assertEqual(wikimap.WikiMap.clean("Parent club(s)"), "parent club")
-        self.assertEqual(wikimap.WikiMap.clean("Team president (men)"), "team president")
+        self.assertEqual(
+            wikimap.WikiMap.clean("Parent club(s)"), "parent club")
+        self.assertEqual(
+            wikimap.WikiMap.clean("Team president (men)"), "team president")
         self.assertEqual(wikimap.WikiMap.clean("Deaconess(es)"), "deaconess")
         self.assertEqual(wikimap.WikiMap.clean("ARWU[5]"), "arwu")
 
     def test_clean_possessive(self):
-        self.assertEqual(wikimap.WikiMap.clean("Women's coach"), "women's coach")
-        self.assertEqual(wikimap.WikiMap.clean("Teams' champion"), "teams' champion")
+        self.assertEqual(
+            wikimap.WikiMap.clean("Women's coach"), "women's coach")
+        self.assertEqual(
+            wikimap.WikiMap.clean("Teams' champion"), "teams' champion")
+
 
 class TestAddToField(unittest.TestCase):
+
     def setUp(self):
         self.test_dict = ["bannana", {"foo": ["bar"]}]
 
@@ -120,31 +133,81 @@ class TestAddToField(unittest.TestCase):
         wikimap.WikiMap.add_to_field(self.test_dict[1], "bar", "aba")
         self.assertEqual(self.test_dict[1], {"foo": ["bar"], "bar": ["aba"]})
 
+    def test_add_to_new_location(self):
+        self.test_dict[1]['infobox'] = {}
+        wikimap.WikiMap.add_to_field(
+            self.test_dict[1]['infobox'], "bar", "aba")
+        self.assertEqual(self.test_dict[1], {"foo": ["bar"],
+                                             "infobox": {"bar": ["aba"]}})
 
-# class TestInsertingInformation(unittest.TestCase):
 
-#     def setUp(self):
-#         self.G = wikimap.WikiMap()
+class TestInsertingInformation(unittest.TestCase):
 
-#     def test_add_to_field(self):
-#         # stub
+    def setUp(self):
+        self.G = wikimap.WikiMap()
 
-#     def test_add_uncleaned(self):
-#         # stub
+    def test_add_uncleaned(self):
+        self.G.add_uncleaned('_unrend_', '_rend_')
 
-#     def test_add_rendering(self):
-#         # stub
+        self.assertItemsEqual(self.G.nodes(), ['unrend', 'rend'])
 
-#     def test_add_infobox(self):
-#         # stub
+        self.assertEqual(self.G.node['unrend']['was'], ['_unrend_'])
+        self.assertEqual(self.G.node['rend']['was'], ['_rend_'])
 
-#     def test_add_mapping(self):
-#         # stub
+    def test_add_rendering(self):
+        self.G.add_edge('unrend', 'rend')
+
+        self.G.add_rendering('Infobox foo bar', 'unrend', 'rend')
+
+        self.assertEqual(self.G.node['unrend']['infobox'],
+                         {'Infobox foo bar': ['unrend']})
+        self.assertEqual(self.G.node['rend']['infobox'],
+                         {'Infobox foo bar': ['rend']})
+
+    def test_add_infobox(self):
+        self.G.add_edge('unrend', 'rend')
+
+        self.G.add_infobox('Infobox foo bar', 'unrend', 'rend')
+
+        self.assertEqual(self.G.edge['unrend']['rend']['infobox'],
+                         ['Infobox foo bar'])
+
+    def test_add_mapping_no_clean(self):
+        self.G.add_mapping('Infobox foo bar', 'unrend', 'rend', False)
+
+        self.assertItemsEqual(self.G.nodes(), ['unrend', 'rend'])
+        self.assertItemsEqual(self.G.edges(), [('unrend', 'rend')])
+
+        self.assertEqual(self.G.node['unrend']['infobox'],
+                         {'Infobox foo bar': ['unrend']})
+        self.assertEqual(self.G.node['rend']['infobox'],
+                         {'Infobox foo bar': ['rend']})
+
+        self.assertEqual(self.G.edge['unrend']['rend']['infobox'],
+                         ['Infobox foo bar'])
+
+    def test_add_mapping_with_clean(self):
+        self.G.add_mapping('Infobox foo bar', '_unrend_', '_rend_', True)
+
+        self.assertItemsEqual(self.G.nodes(), ['unrend', 'rend'])
+        self.assertItemsEqual(self.G.edges(), [('unrend', 'rend')])
+
+        self.assertEqual(self.G.node['unrend']['infobox'],
+                         {'Infobox foo bar': ['unrend']})
+        self.assertEqual(self.G.node['rend']['infobox'],
+                         {'Infobox foo bar': ['rend']})
+
+        self.assertEqual(self.G.edge['unrend']['rend']['infobox'],
+                         ['Infobox foo bar'])
+
+        self.assertEqual(self.G.node['unrend']['was'], ['_unrend_'])
+        self.assertEqual(self.G.node['rend']['was'], ['_rend_'])
+
 
 # class TestFetchingInformation(unittest.TestCase):
 
 #     def setUp(self):
-        
+
 
 #     def test_infoboxes_of_graph_node(self):
 #         # stub

@@ -88,7 +88,7 @@ class WikiMap(nx.DiGraph):
     # FETCHING INFORMATION
     def infoboxes_of_graph_node(self, nodeName):
         """Return a list of infoboxes of a node"""
-        return self.node[nodeName].keys()
+        return self.node[nodeName]['infobox'].keys()
 
     def infoboxes_of_graph(self):
         """Return a (non-redunant) list of a graph's infoboxes"""
@@ -99,7 +99,7 @@ class WikiMap(nx.DiGraph):
 
     def rendering_of_graph_node(self, nodeName):
         """Return either 'unrend', 'rend', or 'mixed' about a node"""
-        rendingList = [item for sublist in self.node[nodeName].values(
+        rendingList = [item for sublist in self.node[nodeName]['infobox'].values(
         ) for item in sublist]
         # due to flattening [['unrend'],['rend','unrend']] etc.
 
@@ -137,7 +137,8 @@ class WikiMap(nx.DiGraph):
                 node = node.replace(punct, '')
 
             node = node.lower()           # lowercase
-            node = ' '.join(node.split())  # replace all multiple spaces with one
+            # replace all multiple spaces with one
+            node = ' '.join(node.split())
         return node
 
     @staticmethod
@@ -149,30 +150,32 @@ class WikiMap(nx.DiGraph):
 
     def add_uncleaned(self, unrend, rend):
         for node in (unrend, rend):
-            clean_node = clean(node)
+            clean_node = WikiMap.clean(node)
             self.add_node(clean_node)
-            add_to_field(self.node[clean_node], 'was', node)
+            WikiMap.add_to_field(self.node[clean_node], 'was', node)
 
-    def add_rendering(self, unrend, rend):
+    def add_rendering(self, infobox, unrend, rend):
         rend_state = 'unrend'  # first deal with unrend
         for node in (unrend, rend):
-            add_to_field(self.node[node], infobox, rendState)
+            self.node[node]['infobox'] = {}
+            WikiMap.add_to_field(
+                self.node[node]['infobox'], infobox, rend_state)
             rend_state = 'rend'  # now we're dealing with rend
 
     def add_infobox(self, infobox, unrend, rend):
-        add_to_field(self.edge[unrend][rend], 'infobox', infobox)
+        WikiMap.add_to_field(self.edge[unrend][rend], 'infobox', infobox)
 
     def add_mapping(self, infobox, unrend, rend, clean):
         """Add mapping for [infobox] (str) between [unrendered] (str) and
         [rendered] (str) to the specified [graph] (WikiMap object)"""
-        if clean:
+        if WikiMap.clean:
             self.add_uncleaned(unrend, rend)
-            unrend = clean(unrend)
-            rend = clean(rend)
+            unrend = WikiMap.clean(unrend)
+            rend = WikiMap.clean(rend)
 
         self.add_edge(unrend, rend)
 
-        self.add_rendering(unrend, rend)
+        self.add_rendering(infobox, unrend, rend)
         self.add_infobox(infobox, unrend, rend)
 
     # ANALYTICS:
