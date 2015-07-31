@@ -93,8 +93,8 @@ class WikiMap(nx.DiGraph):
     def infoboxes_of_graph(self):
         """Return a (non-redunant) list of a graph's infoboxes"""
         infoboxes = []
-        for nodeName in super(WikiMap, self).nodes():
-            infoboxes = infoboxes + self.infoboxes_of_graph_node(nodeName)
+        for node_name in super(WikiMap, self).nodes():
+            infoboxes = infoboxes + self.infoboxes_of_graph_node(node_name)
         return list(set(infoboxes))
 
     def rendering_of_graph_node(self, nodeName):
@@ -109,6 +109,9 @@ class WikiMap(nx.DiGraph):
             return 'rend'
         else:
             return 'mixed'
+
+    def infoboxes_of_pair(self, unrend, rend):
+        return self.edge[unrend][rend]['infobox']
 
     # INSERTING INFORMATION
     @staticmethod
