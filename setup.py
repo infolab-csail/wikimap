@@ -14,6 +14,7 @@ setup(
     ],
     install_requires=[
         'xlrd',
+        'unidecode',
         'networkx',
         'wikipediabase'
     ],
