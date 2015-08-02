@@ -42,9 +42,9 @@ def main(argv):
                         help="path to input excel of infobox templates")
 
     parser.add_argument("graph", help="path to output network graph file")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
-    print "recieved {e} and {g}".format(e=args.excel, g=args.graph)
+    print "received {e} and {g}".format(e=args.excel, g=args.graph)
 
     # infoboxes = data.get_infoboxes(args.excel)
     # G = create_graph(infoboxes, args.clean)
