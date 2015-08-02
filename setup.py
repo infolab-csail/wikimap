@@ -16,6 +16,7 @@ setup(
         'xlrd',
         'unidecode',
         'networkx',
+        'matplotlib',
         'wikipediabase'
     ],
     dependency_links=[
