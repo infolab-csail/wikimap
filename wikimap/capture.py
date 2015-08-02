@@ -1,17 +1,20 @@
 #!/usr/bin/env python2
 
 import argparse
+import sys
 import networkx as nx
-import wikimap
 import matplotlib.pyplot as plt
+from wikimap import data, graph
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("graph", help="path to input network graph file")
+
+def main(argv):
+    parser = argparse.ArgumentParser(prog='capture',
+                                     description='Capture images of subgraphs')
+    parser.add_argument("graph", help="path to input networkx graph file")
     parser.add_argument("images", help="path to output directory for images")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
-    G = nx.read_gpickle(args.graph)
+    G = data.read_graph(args.graph)
     lengths = G.connected_component_statistics().keys()
     lengths.sort(reverse=True)
     for len in lengths:
@@ -20,8 +23,9 @@ def main():
         for idx, sub in enumerate(subGraphs):
             print "---- number " + str(idx + 1) + " ----"
             nx.draw(sub, with_labels=True, arrows=True)
-            plt.savefig(args.images + "len-" + str(len) + "-num-" + str(idx + 1) + ".png", bbox_inches="tight")
+            plt.savefig(args.images + "len-" + str(len) +
+                        "-num-" + str(idx + 1) + ".png", bbox_inches="tight")
         print "======================================="
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
