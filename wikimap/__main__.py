@@ -1,52 +1,27 @@
 import argparse
-
-usage = '''wikimap <command>
-
-Commands:
-    attributes     Get all infobox attributes
-    create         Create network
-    explosion      Analyze the explosion
-    findempty      Find empty
-    images         Get images
-    names          Get names
-'''
-
+import sys
+from wikimap import babble, capture, create, status
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Extracts relationships from Wikipedia infobox attributes.',
-        usage=usage)
+        description='Extracts relationships from Wikipedia infobox attributes.')
 
-    parser.add_argument('<command>',
-                        help='Subcommand to run',
-                        choices=[
-                            'attributes',
-                            'create',
-                            'explosion',
-                            'findempty',
-                            'images',
-                            'names',
-                        ])
+    subparsers = parser.add_subparsers(help='Subcommand to run')
 
-    args = parser.parse_args()
-    run_command(args.command)
+    parser_babble = subparsers.add_parser('babble', help='Print nodenames')
+    parser_babble.set_defaults(func=babble.main)
 
+    parser_capture = subparsers.add_parser('capture', help='Capture images of subgraphs')
+    parser_capture.set_defaults(func=capture.main)
 
-def run_command(c):
-    # TODO : call wikimap methods
-    if c == 'attributes':
-        print 'wikimap called with command: attributes'
-    elif c == 'create':
-        print 'wikimap called with command: create'
-    elif c == 'explosion':
-        print 'wikimap called with command: explosion'
-    elif c == 'findempty':
-        print 'wikimap called with command: findempty'
-    elif c == 'images':
-        print 'wikimap called with command: images'
-    elif c == 'names':
-        print 'wikimap called with command: names'
+    parser_create = subparsers.add_parser('create', help='Create a WikiMap')
+    parser_create.set_defaults(func=create.main)
 
+    parser_status = subparsers.add_parser('status', help='Show stats about WikiMap')
+    parser_status.set_defaults(func=status.main)
+
+    args = parser.parse_args(sys.argv[1:2])
+    args.func(sys.argv[2:])
 
 if __name__ == '__main__':
     main()

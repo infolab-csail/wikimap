@@ -1,12 +1,19 @@
 #!/usr/bin/env python2
 
-import networkx as nx
-import wikimap
+import argparse
+import sys
 from unidecode import unidecode
+from wikimap import data, graph
 
 
-def main():
-    G = nx.read_gpickle("data/attributeSynonyms.gpickle")
+def main(argv):
+    parser = argparse.ArgumentParser(prog='babble',
+                                     description='Print nodenames')
+    parser.add_argument("graph", help="path to input networkx graph file")
+    args = parser.parse_args(argv)
+
+    G = data.read_graph(args.graph)
+    graph.WikiMap.convert_to_special(G)
     lengths = sorted(G.connected_component_statistics().keys())
     for length in lengths:
         print "length " + str(length) + " node groups:"
@@ -18,4 +25,4 @@ def main():
         print "======================================="
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])

@@ -15,7 +15,7 @@ import sys
 import json
 import operator
 import networkx as nx
-from wikimap import data, stats, wikimap
+from wikimap import data, stats, graph
 from xlrd import open_workbook
 
 

@@ -1,5 +1,4 @@
 import networkx as nx
-import wikimap
 
 
 def percent_str(part, total):
