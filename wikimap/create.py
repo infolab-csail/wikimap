@@ -44,25 +44,23 @@ def main(argv):
     parser.add_argument("graph", help="path to output network graph file")
     args = parser.parse_args(argv)
 
-    print "received {e} and {g}".format(e=args.excel, g=args.graph)
+    infoboxes = data.get_infoboxes(args.excel)
+    G = create_graph(infoboxes, args.clean)
 
-    # infoboxes = data.get_infoboxes(args.excel)
-    # G = create_graph(infoboxes, args.clean)
+    print("Saving graph...")
+    data.write_graph(G, args.graph)
 
-    # print("Saving graph...")
-    # data.write_graph(G, args.graph)
+    all_mappings = data.get_all_mappings(args.excel)
+    if (args.save):
+        data.write_json(all_mappings, args.save)
 
-    # all_mappings = data.get_all_mappings(args.excel)
-    # if (args.save):
-    #     data.write_json(all_mappings, args.save)
-
-    # print "DONE. Graphed a newtork of {nodes} nodes and {edges} edges " \
-    #     "from {pairs} unrendered : rendered attribute pairs, spanning " \
-    #     "{infoboxes} infoboxes".format(
-    #         nodes=str(G.number_of_nodes()),
-    #         edges=str(G.number_of_edges()),
-    #         pairs=str(stats.dict_sublength(all_mappings)),
-    #         infoboxes=str(data.total_infoboxes(args.excel)))
+    print "DONE. Graphed a newtork of {nodes} nodes and {edges} edges " \
+        "from {pairs} unrendered : rendered attribute pairs, spanning " \
+        "{infoboxes} infoboxes".format(
+            nodes=str(G.number_of_nodes()),
+            edges=str(G.number_of_edges()),
+            pairs=str(stats.dict_sublength(all_mappings)),
+            infoboxes=str(data.total_infoboxes(args.excel)))
 
 if __name__ == '__main__':
     main(sys.argv[1:])
