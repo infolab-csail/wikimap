@@ -1,4 +1,7 @@
 # WikiMap
+[![Build Status](https://travis-ci.org/michaelsilver/wikimap.svg?branch=master)](https://travis-ci.org/michaelsilver/wikimap)
+[![Coverage Status](https://coveralls.io/repos/michaelsilver/wikimap/badge.svg?branch=master&service=github)](https://coveralls.io/github/michaelsilver/wikimap?branch=master)
+
 Identifies contextual synonyms of Wikipedia Infobox attributes by establishing a link between predicate-synonyms and entity classes. Work for the [CSAIL InfoLab](http://groups.csail.mit.edu/infolab/).
 
 Represents synonymy in graphs such as this one:
