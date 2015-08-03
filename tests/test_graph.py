@@ -274,3 +274,27 @@ class TestFetchingInformation(unittest.TestCase):
                               ['Infobox foo bar'])
         self.assertItemsEqual(self.G.infoboxes_of_pair('hybrid', 'rend'),
                               ['Infobox baz bang', 'Infobox aba zaba'])
+
+
+class TestAnalytics(unittest.TestCase):
+    def test_connected_component_nodes_with_size(self):
+        G = graph.WikiMap()
+
+        # four node group
+        G.add_edge("A", "B")
+        G.add_edge("A", "C")
+        G.add_edge("D", "C")
+
+        # three node group
+        G.add_edge("Y", "X")
+        G.add_edge("Z", "X")
+
+        # three node group (another)
+        G.add_edge("alpha", "beta")
+        G.add_edge("alpha", "gamma")
+
+        # two node group
+        G.add_edge("M", "N")
+
+        self.assertItemsEqual(G.connected_component_nodes_with_size(3),
+                              [["Y", "X", "Z"], ["alpha", "beta", "gamma"]])
