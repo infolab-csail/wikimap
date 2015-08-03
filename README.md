@@ -1,55 +1,40 @@
 # WikiMap
-Extract useful relationships from Wikipedia's Infobox attributes using mappings from Chris's [WikipediaBase](https://github.com/fakedrake/WikipediaBase). Work for the [CSAIL InfoLab](http://groups.csail.mit.edu/infolab/)
+Identifies contextual synonyms of Wikipedia Infobox attributes by establishing a link between predicate-synonyms and entity classes. Work for the [CSAIL InfoLab](http://groups.csail.mit.edu/infolab/).
 
-_previously known as "Attribute Analyzer"_
-
-## Generating an Infobox Attribute Graph
-How to extract unrendered ==> rendered mappings from Chris's WikipediaBase, and then create a network (or graph) such as this one:
+Represents synonymy in graphs such as this one:
 ![Alt text](/../master/images/keyPeople35.png?raw=true "Example Graph")
 
-Steps:
+# Install
+```Bash 
+$ git clone https://github.com/michaelsilver/wikimap.git
+$ cd wikimap
+wikimap$ python setup.py develop  # to get stay updated on new developments
+```
 
-1: First, find a machine with Chris's [WikipediaBase](https://github.com/fakedrake/WikipediaBase) installed, or otherwise install WikipediaBase.
+# Usage
+The install gives you one Command Line Interface entrypoint called `wikimap`. All commands are run as subcommands of `wikimap`. You can run any subcommand by running:
 ```Bash
-$ git clone https://github.com/fakedrake/WikipediaBase.git
-$ sudo pip install wikipediabase
-$ sudo apt-get install libxml2-dev libxslt1-dev python-dev  # some ubuntu machines might not have some packages installed
-$ sudo pip install -r requirements.txt
+$ wikimap <SUBCOMMAND> <OPTIONS>
 ```
-
-2: Clone this repo and copy some key files onto the machine with WikipediaBase installed.
+For up-to-date documentation and a list of all subcommands, simply run
 ```Bash
-$ git clone https://github.com/michaelsilver/Attribute-Analyzer.git
-$ cp Attribute-Analyzer/createNetwork.py WikipediaBase/
-$ cp Attribute-Analyzer/synonym_network.py WikipediaBase/
+$ wikimap -h
 ```
-You will also need to put `infoboxes.xlsx` in the `WikipediaBase` directory. If you have it on your computer, you can use `scp`. Syntax: `scp /path/to/file username@a:/path/to/destination`
 
-3: Run `allInfoboxAttributes.py` and `infoboxes.json` should pop up.
-```
-$ python allInfoboxAttributes.py
-```
-Congratulations, you've now stolen all the data out of WikipediaBase that we need! All the unrendered ==> rendered attribute mappings are now stored in `infoboxes.json`
-
-4: Put a full clone of the repo on any machine of your choosing, and put `infoboxes.json`. This way you will be indipendant of WikipediaBase
+For up-to-date documentation on any of the listed subcommands, simply run
 ```Bash
-$ git clone https://github.com/michaelsilver/Attribute-Analyzer.git
-$ mkdir data/  # to structure the repo the way we need it
-$ scp username@remote-machine:/path/to/file ./data/  # put infoboxes.json where it needs to be
-$ python createNetwork.py
+$ wikimap <SUBCOMMAND> -h
 ```
-Now the graph is saved in `data/attributeSynonyms.gpickle`. All done; you now have the graph, proceed to "Analyzing the Attribute Graph"
 
-## Analyzing the Attribute Graph
-All analysis tools are located in the `synonym_network.py` libarary. To use it, import the necessary libaries, load the saved graph, and you can then do whatever analysis you want.
-```Bash
-$ python
->>> import networkx as nx
->>> import synonym_network as sn
->>> G = nx.read_gpickle("data/attributeSynonyms.gpickle")
-```
-Then you can do whatever you want with the graph now saved in the variable `G`; for example,
-```Python
->>> G.nodes()
-```
-will print out all the nodes in the network.
+Major subcommands:
+## `create`
+`wikimap create <OPTIONS>` creates a new WikiMap graph, which represents relationships between infobox attributes. An example graph can be seen at the top of the README. 
+
+## `status`
+`wikimap status <OPTIONS>` prints statistics and information about an existant graph.
+
+## `capture`
+`wikimap capture <OPTIONS>` creates images, such as the one at the beginning of this README, of all separate subgraphs in an existant graph. 
+
+## `babble`
+`wikimap babble <OPTIONS>` prints all of the nodes in a graph. This command is commonly used in conjunction with a redirect into a file, e.g. `wikimap babble <OPTIONS> > my-output-file.txt`
