@@ -4,7 +4,7 @@ from wikimap import babble, capture, create, status
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Extracts relationships from Wikipedia infobox attributes.')
+        description='Identifies contextual synonyms of Wikipedia Infobox attributes.')
 
     subparsers = parser.add_subparsers(help='Subcommand to run')
 
