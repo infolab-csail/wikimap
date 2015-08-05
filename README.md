@@ -7,6 +7,8 @@ Identifies contextual synonyms of Wikipedia Infobox attributes by establishing a
 Represents synonymy in graphs such as this one:
 ![Alt text](/../master/images/keyPeople35.png?raw=true "Example Graph")
 
+More detailed results can be seen in the [iPython notebook](https://github.com/michaelsilver/wikimap/blob/master/WikiMap%20Analysis.ipynb).
+
 # Install
 ```Bash 
 $ git clone https://github.com/michaelsilver/wikimap.git
