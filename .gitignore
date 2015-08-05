@@ -1,5 +1,6 @@
 *.dbm
 */data-folder/*
+*.ipynb
 
 # Created by https://www.gitignore.io
 
