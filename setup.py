@@ -15,6 +15,7 @@ setup(
     install_requires=[
         'xlrd',
         'unidecode',
+        'nltk',
         'networkx',
         'matplotlib',
         'wikipediabase'
