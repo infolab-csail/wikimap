@@ -2,9 +2,9 @@ language: python
 python:
     - "2.7"
 install:
-    - python2.7 -c "import nltk; nltk.download('wordnet');"
     - pip install coveralls
     - python setup.py install
+    - python2.7 -c "import nltk; nltk.download('wordnet');"
 script:
     - coverage run setup.py test
 after_success:
