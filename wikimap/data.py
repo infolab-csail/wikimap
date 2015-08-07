@@ -51,7 +51,6 @@ def get_single_mappings(infobox):
     return get_meta_infobox(infobox).rendered_keys()
 
 
-# TODO: add caching decorator
 def get_all_mappings(path):
     """Given path to excel file, return dictionary with attribute mappings"""
     return _get_all_mappings(get_infoboxes(path))
@@ -62,7 +61,6 @@ def _get_all_mappings(infoboxes):
     return {infobox: get_single_mappings(infobox) for infobox in infoboxes}
 
 
-# TODO: add caching decorator
 def get_infoboxes(path):
     """Given path to excel file, return list of infoboxes"""
     return _get_infoboxes(get_infobox_totals(path))
@@ -73,7 +71,6 @@ def _get_infoboxes(infobox_totals):
     return infobox_totals.keys()
 
 
-# TODO: add caching decorator
 def total_infoboxes(path):
     """Given path to excel file, return total number of infoboxes"""
     return _total_infoboxes(get_infobox_totals(path))
@@ -84,7 +81,6 @@ def _total_infoboxes(infobox_totals):
     return len(infobox_totals)
 
 
-# TODO: add caching decorator
 def total_pages(path):
     """Given path to excel file, return total number of wikipedia pages"""
     return _total_pages(get_infobox_totals(path))
