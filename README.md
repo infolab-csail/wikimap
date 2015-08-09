@@ -1,17 +1,17 @@
 # WikiMap
-[![Build Status](https://travis-ci.org/michaelsilver/wikimap.svg?branch=master)](https://travis-ci.org/michaelsilver/wikimap)
-[![Coverage Status](https://coveralls.io/repos/michaelsilver/wikimap/badge.svg?branch=master&service=github)](https://coveralls.io/github/michaelsilver/wikimap?branch=master)
+[![Build Status](https://travis-ci.org/infolab-csail/wikimap.svg?branch=master)](https://travis-ci.org/infolab-csail/wikimap)
+[![Coverage Status](https://coveralls.io/repos/infolab-csail/wikimap/badge.svg?branch=master&service=github)](https://coveralls.io/github/infolab-csail/wikimap?branch=master)
 
 Identifies contextual synonyms of Wikipedia Infobox attributes by establishing a link between predicate-synonyms and entity classes. Work for the [CSAIL InfoLab](http://groups.csail.mit.edu/infolab/).
 
 Represents synonymy in graphs such as this one:
 ![Alt text](/../master/images/keyPeople35.png?raw=true "Example Graph")
 
-More detailed results can be seen in the [iPython notebook](https://github.com/michaelsilver/wikimap/blob/master/WikiMap%20Analysis.ipynb).
+More detailed results can be seen in the [iPython notebook](/../master/WikiMap%20Analysis.ipynb).
 
 # Install
 ```Bash 
-$ git clone https://github.com/michaelsilver/wikimap.git
+$ git clone https://github.com/infolab-csail/wikimap.git
 $ cd wikimap
 wikimap$ python setup.py develop  # to get stay updated on new developments
 ```
