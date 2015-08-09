@@ -7,7 +7,7 @@ setup(
     description='Extract relationships from Wiki Infobox Attributes.',
     author='Michael Silver',
     author_email='msilver@csail.mit.edu',
-    url='https://github.com/michaelsilver/wikimap',
+    url='https://github.com/infolab-csail/wikimap.git',
     packages=[
         'wikimap',
         'tests'
