@@ -18,12 +18,12 @@ setup(
         'nltk',
         'networkx',
         'matplotlib',
-        'wikipediabase'
+        'wikipediabase',
+        'defexpand'
     ],
     dependency_links=[
-        # The upstream version on pypi will probably be out of date
-        # until this gets deployed
-        'git+https://github.com/fakedrake/wikipediabase.git#egg=wikipediabase'
+        'git+https://github.com/fakedrake/wikipediabase.git#egg=wikipediabase',
+        'git+https://github.com/infolab-csail/defexpand.git#egg=defexpand'
     ],
     tests_require=[
         'nose>=1.0',
