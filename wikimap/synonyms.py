@@ -1,8 +1,10 @@
+from defexpand import infoclass
 from nltk.corpus import wordnet as wn
 from nltk.stem import WordNetLemmatizer
 import nltk.tag
 from unidecode import unidecode
 
+ontology = infoclass.get_info_ontology()
 lemmatizer = WordNetLemmatizer()
 
 
@@ -35,6 +37,35 @@ def id_synset(primary, keys):
                                + str(len(sublist)) + " synsets found")
         else:
             return sublist[0]
+
+
+def intersect_ordered(first, second):
+    """Finds intersection of two lists, preserving order of first"""
+    _auxset = set(second)
+    return [x for x in first if x in _auxset]
+
+
+def similarity_between(infobox_first, infobox_second):
+    """Gets raw data about the similarity of two infoboxes from
+    DBpedia Ontology
+    """
+    _above_first = ontology.classes_above_infobox(infobox_first)
+    _above_second = ontology.classes_above_infobox(infobox_second)
+
+    # get lowest shared class in DBpedia ontology tree
+    shared_dbpedia_class = intersect_ordered(_above_first, _above_second)[0]
+
+    # count classes above the infobox's immediate class
+    # (if they are the same, counts will =0)
+    count_from_first = _above_first.index(shared_dbpedia_class)
+    count_from_second = _above_second.index(shared_dbpedia_class)
+
+    # counts includes the root (if they only share root, then count_from_root=0)
+    _above_shared = ontology.classes_above(shared_dbpedia_class)
+    count_from_root = len(_above_shared) - 1 # so root = 0
+
+    return [shared_dbpedia_class, count_from_root,
+            count_from_first, count_from_second]
 
 
 def get_wordnet_pos(treebank_tag):

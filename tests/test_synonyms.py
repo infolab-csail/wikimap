@@ -45,3 +45,27 @@ class TestIdSynset(unittest.TestCase):
         self.assertItemsEqual(
             synonyms.id_synset('maintain', ['conserve', 'preserve']),
             ['conserve', 'preserve', 'maintain', 'keep up'])
+
+
+class TestSimilarity(unittest.TestCase):
+    def test_intersect_ordered(self):
+        a = [5,4,3,2,1]
+        b = [1,3,5,6]
+        # assertEqual not assertItemsEqual b/c order matters
+        self.assertEqual(synonyms.intersect_ordered(a, b), [5,3,1])
+
+    def test_similarity_between_same(self):
+        self.assertEqual(synonyms.similarity_between('bridge', 'bridge'),
+                         ['Bridge', 5, 0, 0])
+
+    def test_similarity_between_at_root(self):
+        self.assertEqual(synonyms.similarity_between('station', 'train'),
+                         ['owl:Thing', 0, 4, 2])
+
+    def test_similarity_between_one_above(self):
+        self.assertEqual(synonyms.similarity_between('bridge', 'tunnel'),
+                         ['RouteOfTransportation', 4, 1, 1])
+
+    def test_similarity_between_random(self):
+        self.assertEqual(synonyms.similarity_between('church', 'japan-station'),
+                         ['ArchitecturalStructure', 2, 2, 3])
