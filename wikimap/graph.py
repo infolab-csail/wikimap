@@ -212,15 +212,3 @@ class WikiMap(nx.DiGraph):
                     print x
         else:
             return ans
-
-    # SYNONYMS
-    # incomplete, in progress
-    def recursive_neighbors(self, node, depth=1):
-        current_layer = self.all_neighbors(node)
-        next_layer = []
-        while depth > 0:
-            for member in current_layer:
-                next_layer += self.all_neighbors(member)
-                next_layer = current_layer
-            depth = depth - 1
-        return neighbors
