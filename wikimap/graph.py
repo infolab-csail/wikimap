@@ -85,6 +85,16 @@ class WikiMap(nx.DiGraph):
 
         return components
 
+    def connected_component_with_node(self, node):
+        """Return the component that contains a given node
+        WARNING: directionality of graph lost in process
+        """
+        component = [x for x in nx.connected_component_subgraphs(
+            self.return_undirected()) if node in x.nodes()][0]
+        WikiMap.convert_to_special(component)
+
+        return component
+
     # SPECIFIC WIKI INFOBOX/ATTRIBUTE METHODS:
 
     # FETCHING INFORMATION

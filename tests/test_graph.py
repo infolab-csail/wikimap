@@ -25,6 +25,31 @@ class TestGeneralNetworkMethods(unittest.TestCase):
         # two node group
         self.G.add_edge("M", "N")
 
+        # EXPECTED:
+        # three node group
+        self.expected_three1 = graph.WikiMap()
+        self.expected_three1.add_edge("Y", "X")
+        self.expected_three1.add_edge("X", "Y")
+        self.expected_three1.add_edge("Z", "X")
+        self.expected_three1.add_edge("X", "Z")
+
+        # three node group (another)
+        self.expected_three2 = graph.WikiMap()
+        self.expected_three2.add_edge("alpha", "beta")
+        self.expected_three2.add_edge("beta", "alpha")
+        self.expected_three2.add_edge("alpha", "gamma")
+        self.expected_three2.add_edge("gamma", "alpha")
+
+        # four node group
+        self.expected_four = graph.WikiMap()
+        self.expected_four.add_edge("A", "B")
+        self.expected_four.add_edge("B", "A")
+        self.expected_four.add_edge("A", "C")
+        self.expected_four.add_edge("C", "A")
+        self.expected_four.add_edge("D", "C")
+        self.expected_four.add_edge("C", "D")
+        # because directionality of graph lost in process
+
     def test_connected_component_lengths(self):
         self.assertItemsEqual(
             self.G.connected_component_lengths(), [2, 3, 3, 4])
@@ -34,35 +59,28 @@ class TestGeneralNetworkMethods(unittest.TestCase):
             self.G.connected_component_statistics(), {2: 1, 3: 2, 4: 1})
 
     def test_connected_components_with_size(self):
-        # three node group
-        expected_three1 = graph.WikiMap()
-        expected_three1.add_edge("Y", "X")
-        expected_three1.add_edge("Z", "X")
-
-        # three node group (another)
-        expected_three2 = graph.WikiMap()
-        expected_three2.add_edge("alpha", "beta")
-        expected_three2.add_edge("alpha", "gamma")
-
-        # four node group
-        expected_four = graph.WikiMap()
-        expected_four.add_edge("A", "B")
-        expected_four.add_edge("B", "A")
-        expected_four.add_edge("A", "C")
-        expected_four.add_edge("C", "A")
-        expected_four.add_edge("D", "C")
-        expected_four.add_edge("C", "D")
-        # because directionality of graph lost in process
-
         self.assertEqual(len(self.G.connected_components_with_size(3)),
-                         len([expected_three1, expected_three2]))
+                         len([self.expected_three1, self.expected_three2]))
         # unfortunately cannot test that two lists of graphs are
         # equal, so only test length of lists here, and then that the
         # graph in the list of len=1 below is equal. Hopefully this is
         # enough.
 
         returned_four = self.G.connected_components_with_size(4)[0]
-        nxt.assert_graphs_equal(returned_four, expected_four)
+        nxt.assert_graphs_equal(returned_four, self.expected_four)
+
+    def test_connected_component_with_node(self):
+        # "X" is a hub
+        returned_three1 = self.G.connected_component_with_node("X")
+        nxt.assert_graphs_equal(returned_three1, self.expected_three1)
+
+        # "beta" is not a hub
+        returned_three2 = self.G.connected_component_with_node("beta")
+        nxt.assert_graphs_equal(returned_three2, self.expected_three2)
+
+        # "A" is a hub
+        returned_four = self.G.connected_component_with_node("A")
+        nxt.assert_graphs_equal(returned_four, self.expected_four)
 
 
 class TestCleaningNodes(unittest.TestCase):
