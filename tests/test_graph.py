@@ -82,6 +82,11 @@ class TestGeneralNetworkMethods(unittest.TestCase):
         returned_four = self.G.connected_component_with_node("A")
         nxt.assert_graphs_equal(returned_four, self.expected_four)
 
+    def test_connected_component_with_node_not_found(self):
+        self.assertRaisesRegexp(
+            nx.exception.NetworkXError, "Node \"junk\" not in graph",
+            self.G.connected_component_with_node, "junk")
+
 
 class TestCleaningNodes(unittest.TestCase):
 

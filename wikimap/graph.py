@@ -90,10 +90,14 @@ class WikiMap(nx.DiGraph):
         WARNING: directionality of graph lost in process
         """
         component = [x for x in nx.connected_component_subgraphs(
-            self.return_undirected()) if node in x.nodes()][0]
-        WikiMap.convert_to_special(component)
-
-        return component
+            self.return_undirected()) if node in x.nodes()]
+        if len(component) == 1:
+            component = component[0]
+            WikiMap.convert_to_special(component)
+            return component
+        else:
+            raise nx.exception.NetworkXError(
+                "Node \"" + node + "\" not in graph")
 
     # SPECIFIC WIKI INFOBOX/ATTRIBUTE METHODS:
 
