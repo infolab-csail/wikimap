@@ -68,6 +68,26 @@ def similarity_between(infobox_first, infobox_second):
             count_from_first, count_from_second]
 
 
+def similar_enough(infobox_first,
+                   infobox_second,
+                   min_from_root = 1,
+                   max_from_either_infobox = 2):
+                   # special_cases = True):
+    _similarity_between = similarity_between(infobox_first, infobox_second)
+    [shared_dbpedia_class, count_from_root,
+     count_from_first, count_from_second] = _similarity_between
+
+    # very_general_classes = ['Agent', 'Event', 'Place']
+    # _is_special = shared_dbpedia_class in very_general_classes
+
+    # if max_from_either_infobox == 2 and _is_special and special_cases:
+    #    max_from_either_infobox = 3
+
+    within_max_from_infobox = (count_from_first <= max_from_either_infobox and
+                               count_from_second <= max_from_either_infobox)
+
+    return within_max_from_infobox and count_from_root >= min_from_root
+
 def get_wordnet_pos(treebank_tag):
     if treebank_tag.startswith('J'):
         return wn.ADJ

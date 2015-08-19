@@ -69,3 +69,21 @@ class TestSimilarity(unittest.TestCase):
     def test_similarity_between_random(self):
         self.assertEqual(synonyms.similarity_between('church', 'japan-station'),
                          ['ArchitecturalStructure', 2, 2, 3])
+
+    def test_similar_enough_two_above(self):
+        # 'Bridge' and 'RailwayStation'
+        self.assertTrue(synonyms.similar_enough('bridge', 'japan-station'))
+
+    def test_similar_enough_two_above_diff_levels(self):
+        # 'Bridge' and 'Station'
+        self.assertTrue(synonyms.similar_enough('bridge', 'station'))
+        # 'Lake' and 'River'
+        self.assertTrue(synonyms.similar_enough('lake', 'river'))
+
+    def test_not_similar_enough_two_above_diff_levels(self):
+        # 'River' and 'MountainRange'
+        self.assertFalse(synonyms.similar_enough('river', 'mountain-range'))
+
+    def test_similar_enough_totally_unrelated(self):
+        # 'YearInSpaceflight' and 'SupremeCourtOfTheUnitedStatesCase'
+        self.assertFalse(synonyms.similar_enough('year-in-spaceflight', 'scotus-case'))
