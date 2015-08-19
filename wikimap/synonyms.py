@@ -1,11 +1,9 @@
 from defexpand import infoclass
 from nltk.corpus import wordnet as wn
-from nltk.stem import WordNetLemmatizer
 import nltk.tag
 from unidecode import unidecode
 
 ontology = infoclass.get_info_ontology()
-lemmatizer = WordNetLemmatizer()
 
 
 def clean_wordnet(word):
@@ -87,25 +85,6 @@ def similar_enough(infobox_first,
                                count_from_second <= max_from_either_infobox)
 
     return within_max_from_infobox and count_from_root >= min_from_root
-
-def get_wordnet_pos(treebank_tag):
-    if treebank_tag.startswith('J'):
-        return wn.ADJ
-    elif treebank_tag.startswith('V'):
-        return wn.VERB
-    elif treebank_tag.startswith('N'):
-        return wn.NOUN
-    elif treebank_tag.startswith('R'):
-        return wn.ADV
-    else:
-        raise KeyError("Treebank contains no such tag: " + treebank_tag)
-
-
-def auto_lemmatize(word):
-    # TODO: this handles single words nicely, but cannot do 'maintained by'
-    tagged = nltk.pos_tag([word])[0]
-    treebank_pos = tagged[1]
-    return lemmatizer.lemmatize(word, get_wordnet_pos(treebank_pos))
 
 
 # def get_synonyms(object_class, property, value_class):
