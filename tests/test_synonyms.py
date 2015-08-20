@@ -41,7 +41,7 @@ class TestIdSynset(unittest.TestCase):
             "Keys insufficient to uniquely identify synset, \d synsets found",
             synonyms.id_synset, 'maintain', ['keep', 'junk'])
 
-    def tes_id_synset_many_oversufficient_keys(self):
+    def test_id_synset_many_oversufficient_keys(self):
         self.assertItemsEqual(
             synonyms.id_synset('maintain', ['conserve', 'preserve']),
             ['conserve', 'preserve', 'maintain', 'keep up'])
