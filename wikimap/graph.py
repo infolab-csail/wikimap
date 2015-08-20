@@ -191,7 +191,7 @@ class WikiMap(nx.DiGraph):
     def add_mapping(self, infobox, unrend, rend, clean):
         """Add mapping for [infobox] (str) between [unrendered] (str) and
         [rendered] (str) to the specified [graph] (WikiMap object)"""
-        if WikiMap.clean:
+        if clean:
             self.add_uncleaned(unrend, rend)
             unrend = WikiMap.clean(unrend)
             rend = WikiMap.clean(rend)
