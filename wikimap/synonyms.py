@@ -91,24 +91,6 @@ def similar_enough(infobox_first,
     return within_max_from_infobox and count_from_root >= min_from_root
 
 
-def similar_enough_to_list(infobox, infoboxes_for_context, intersect):
-    if intersect:
-        # intersect, all()
-        all(similar_enough(infobox, context)
-            for context in infoboxes_for_context)
-    else:
-        # union, any()
-        any(similar_enough(infobox, context)
-            for context in infoboxes_for_context)
-
-
-def node_is_in_context(graph, node, infoboxes_for_context, intersect):
-    _infobox_in_context = lambda infobox: similar_enough_to_list(
-        infobox, infoboxes_for_context, intersect)
-    infoboxes = graph.infoboxes_of_graph_node(node)
-    return any(_infobox_in_context(infobox) for infobox in infoboxes)
-
-
 def post_paraphrase_cleanup(node_list, exclude_unrend):
     clean_list = [node for node in node_list if
                   '!!!!!' not in node and 'File:' not in node]
@@ -129,15 +111,24 @@ def paraphrase(attribute, infoboxes_for_context,
     infoboxes to use for context-searching, return other attributes
     (and their infobox?) as paraphrases. If attribute does not exist,
     will raise NetworkXError
+
+    Note on 'intersect' boolean. To be considered: should I do an
+    intersection of attributes appropriate for each infobox context,
+    or a union? In other words, should more infoboxes_for_context lead
+    to less (but more precise) paraphrases, or more (but less
+    precise?) paraphrases
     """
-    # Note on 'intersect' boolean. To be considered: should I do an
-    # intersection of attributes appropriate for each infobox context,
-    # or a union? In other words, should more infoboxes_for_context
-    # lead to less (but more precise) paraphrases, or more (but less
-    # precise?) paraphrases
 
     subgraph = master_graph.connected_component_with_node(attribute)
-    _prelim_list = [node for node in subgraph if
-                    node_is_in_context(master_graph, node, infoboxes_for_context)]
+    list_of_lists = [[node for node in subgraph if
+                      any(similar_enough(infobox, context)
+                          for infobox in master_graph.infoboxes_of_graph_node(node))]
+                     for context in infoboxes_for_context]
+    if intersect:
+        # insersect the list_of_lists
+        preliminary_list = list(set(list_of_lists[0]).intersection(*list_of_lists))
+    else:
+        # union the list_of_lists
+        preliminary_list = list(set().union(*list_of_lists))
 
-    return post_paraphrase_cleanup(_prelim_list, exclude_unrend)
+    return post_paraphrase_cleanup(preliminary_list, exclude_unrend)

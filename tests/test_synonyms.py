@@ -93,20 +93,6 @@ class TestSimilarity(unittest.TestCase):
         self.assertFalse(synonyms.similar_enough('year-in-spaceflight', 'scotus-case'))
         self.assertFalse(synonyms.similar_enough('scotus-case', 'year-in-spaceflight'))
 
-    def test_similar_enough_to_list_intersect_on(self):
-        # intersect, all()
-        self.assertTrue(synonyms.similar_enough_to_list(
-            'bridge', ['japan-station', 'station'], True))
-        self.assertFalse(synonyms.similar_enough_to_list(
-            'bridge', ['japan-station', 'station', 'river'], True))
-
-    def test_similar_enough_to_list_intersect_off(self):
-        # union, any()
-        self.assertTrue(synonyms.similar_enough_to_list(
-            'bridge', ['japan-station', 'station'], False))
-        self.assertTrue(synonyms.similar_enough_to_list(
-            'bridge', ['japan-station', 'station', 'river'], False))
-
 
 class TestParaphrase(unittest.TestCase):
 
