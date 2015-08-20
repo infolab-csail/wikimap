@@ -73,17 +73,71 @@ class TestSimilarity(unittest.TestCase):
     def test_similar_enough_two_above(self):
         # 'Bridge' and 'RailwayStation'
         self.assertTrue(synonyms.similar_enough('bridge', 'japan-station'))
+        self.assertTrue(synonyms.similar_enough('japan-station', 'bridge'))
 
     def test_similar_enough_two_above_diff_levels(self):
         # 'Bridge' and 'Station'
         self.assertTrue(synonyms.similar_enough('bridge', 'station'))
+        self.assertTrue(synonyms.similar_enough('station', 'bridge'))
         # 'Lake' and 'River'
         self.assertTrue(synonyms.similar_enough('lake', 'river'))
+        self.assertTrue(synonyms.similar_enough('river', 'lake'))
 
     def test_not_similar_enough_two_above_diff_levels(self):
         # 'River' and 'MountainRange'
         self.assertFalse(synonyms.similar_enough('river', 'mountain-range'))
+        self.assertFalse(synonyms.similar_enough('mountain-range', 'river'))
 
     def test_similar_enough_totally_unrelated(self):
         # 'YearInSpaceflight' and 'SupremeCourtOfTheUnitedStatesCase'
         self.assertFalse(synonyms.similar_enough('year-in-spaceflight', 'scotus-case'))
+        self.assertFalse(synonyms.similar_enough('scotus-case', 'year-in-spaceflight'))
+
+    def test_similar_enough_to_list_intersect_on(self):
+        # intersect, all()
+        self.assertTrue(synonyms.similar_enough_to_list(
+            'bridge', ['japan-station', 'station'], True))
+        self.assertFalse(synonyms.similar_enough_to_list(
+            'bridge', ['japan-station', 'station', 'river'], True))
+
+    def test_similar_enough_to_list_intersect_off(self):
+        # union, any()
+        self.assertTrue(synonyms.similar_enough_to_list(
+            'bridge', ['japan-station', 'station'], False))
+        self.assertTrue(synonyms.similar_enough_to_list(
+            'bridge', ['japan-station', 'station', 'river'], False))
+
+
+class TestParaphrase(unittest.TestCase):
+
+    def test_post_paraphrase_cleanup(self):
+        node_list = ['aA !!!!!prev!!!!!', 'next-date', 'A<<!!!!!prev!!!!!',
+                     'replace', 'A !!!!!preceded_by!!!!!', 'followed', 'next',
+                     'nextcomp', 'succeededa by', 'followedby', 'replaced by',
+                     'next tournament', 'aA !!!!!previous!!!!! (previous)',
+                     'aA Previous "!!!!!Prev!!!!!"', 'followed by',
+                     '<A A !!!!!previous!!!!!', 'successor line', 'heir',
+                     'followeda by', 'aA !!!!!previous!!!!!', 'succeeded by',
+                     'successor', 'a -a succeededa by', 'next event', 'succeeded',
+                     '!!!!!suc-type!!!!!', 'previousattraction', 'became',
+                     'replaced', 'replacement', "File: foo"]
+        expected_list = ['next-date',
+                         'replace', 'followed', 'next',
+                         'nextcomp', 'succeededa by', 'followedby', 'replaced by',
+                         'next tournament',
+                         'followed by',
+                         'successor line', 'heir',
+                         'followeda by', 'succeeded by',
+                         'successor', 'a -a succeededa by', 'next event',
+                         'succeeded', 'previousattraction',
+                         'became', 'replaced', 'replacement']
+        self.assertItemsEqual(synonyms.post_paraphrase_cleanup(node_list, False),
+                              expected_list)
+
+    def test_post_paraphrase_cleanup_exclude_unrend(self):
+        node_list = ['lid', 'identifiers', 'iata', 'icao', 'wmo', 'faa', 'tc',
+                     'gps']
+
+        expected_list = ['identifiers']
+        self.assertItemsEqual(synonyms.post_paraphrase_cleanup(node_list, True),
+                              expected_list)
