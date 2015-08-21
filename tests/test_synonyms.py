@@ -72,6 +72,11 @@ class TestSimilarity(unittest.TestCase):
         self.assertEqual(synonyms.similarity_between('church', 'japan-station'),
                          ['ArchitecturalStructure', 2, 2, 3])
 
+    def test_similarity_between_non_existant(self):
+        self.assertRaisesRegexp(
+            KeyError, "non-existant class: junk-asdfasdfasd",
+            synonyms.similarity_between, 'station', 'junk-asdfasdfasd')
+
     def test_similar_enough_two_above(self):
         # 'Bridge' and 'RailwayStation'
         self.assertTrue(synonyms.similar_enough('bridge', 'japan-station'))
@@ -96,6 +101,10 @@ class TestSimilarity(unittest.TestCase):
             'year-in-spaceflight', 'scotus-case'))
         self.assertFalse(synonyms.similar_enough(
             'scotus-case', 'year-in-spaceflight'))
+
+    def test_similar_enough_non_existant(self):
+        self.assertFalse(synonyms.similar_enough(
+            'station', 'junk-asdfasdfasd'))
 
 
 class TestParaphraseUtils(unittest.TestCase):

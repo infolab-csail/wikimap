@@ -53,21 +53,26 @@ def similarity_between(infobox_first, infobox_second):
     _above_first = ontology.classes_above_infobox(infobox_first)
     _above_second = ontology.classes_above_infobox(infobox_second)
 
-    # get lowest shared class in DBpedia ontology tree
-    shared_dbpedia_class = intersect_ordered(_above_first, _above_second)[0]
+    if _above_first == []:
+        raise KeyError("non-existant class: " + infobox_first)
+    elif _above_second == []:
+        raise KeyError("non-existant class: " + infobox_second)
+    else:
+        # get lowest shared class in DBpedia ontology tree
+        shared_dbpedia_class = intersect_ordered(_above_first, _above_second)[0]
 
-    # count classes above the infobox's immediate class
-    # (if they are the same, counts will =0)
-    count_from_first = _above_first.index(shared_dbpedia_class)
-    count_from_second = _above_second.index(shared_dbpedia_class)
+        # count classes above the infobox's immediate class
+        # (if they are the same, counts will =0)
+        count_from_first = _above_first.index(shared_dbpedia_class)
+        count_from_second = _above_second.index(shared_dbpedia_class)
 
-    # counts includes the root (if they only share root, then
-    # count_from_root=0)
-    _above_shared = ontology.classes_above(shared_dbpedia_class)
-    count_from_root = len(_above_shared) - 1  # so root = 0
+        # counts includes the root (if they only share root, then
+        # count_from_root=0)
+        _above_shared = ontology.classes_above(shared_dbpedia_class)
+        count_from_root = len(_above_shared) - 1  # so root = 0
 
-    return [shared_dbpedia_class, count_from_root,
-            count_from_first, count_from_second]
+        return [shared_dbpedia_class, count_from_root,
+                count_from_first, count_from_second]
 
 
 def similar_enough(infobox_first,
@@ -75,20 +80,24 @@ def similar_enough(infobox_first,
                    min_from_root=1,
                    max_from_either_infobox=2):
                    # special_cases = True):
-    _similarity_between = similarity_between(infobox_first, infobox_second)
-    [shared_dbpedia_class, count_from_root,
-     count_from_first, count_from_second] = _similarity_between
+    try:
+        _similarity_between = similarity_between(infobox_first, infobox_second)
+    except KeyError:
+        return False
+    else:
+        [shared_dbpedia_class, count_from_root,
+         count_from_first, count_from_second] = _similarity_between
 
-    # very_general_classes = ['Agent', 'Event', 'Place']
-    # _is_special = shared_dbpedia_class in very_general_classes
+        # very_general_classes = ['Agent', 'Event', 'Place']
+        # _is_special = shared_dbpedia_class in very_general_classes
 
-    # if max_from_either_infobox == 2 and _is_special and special_cases:
-    #    max_from_either_infobox = 3
+        # if max_from_either_infobox == 2 and _is_special and special_cases:
+        #    max_from_either_infobox = 3
 
-    within_max_from_infobox = (count_from_first <= max_from_either_infobox and
-                               count_from_second <= max_from_either_infobox)
+        within_max_from_infobox = (count_from_first <= max_from_either_infobox and
+                                   count_from_second <= max_from_either_infobox)
 
-    return within_max_from_infobox and count_from_root >= min_from_root
+        return within_max_from_infobox and count_from_root >= min_from_root
 
 
 def post_paraphrase_cleanup(node_list, exclude_unrend, graph=master_graph):
