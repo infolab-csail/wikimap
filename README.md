@@ -38,8 +38,5 @@ Major subcommands:
 ## `status`
 `wikimap status <OPTIONS>` prints statistics and information about an existant graph.
 
-## `capture`
-`wikimap capture <OPTIONS>` creates images, such as the one at the beginning of this README, of all separate subgraphs in an existant graph. 
-
 ## `babble`
 `wikimap babble <OPTIONS>` prints all of the nodes in a graph. This command is commonly used in conjunction with a redirect into a file, e.g. `wikimap babble <OPTIONS> > my-output-file.txt`
