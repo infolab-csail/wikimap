@@ -161,6 +161,27 @@ class TestParaphrase(unittest.TestCase):
         self.assertTrue(synonyms.similar_enough('foo', 'foo'))
         self.assertFalse(synonyms.similar_enough('foo', 'bar'))
 
+    def test_paraphrase_graph_one_context(self):
+        self.assertItemsEqual(
+            synonyms._paraphrase_graph(
+                self.fake_graph, "A", ["foo"], True, False),
+            ["B", "C", "E", "D"])
+
+        self.assertItemsEqual(
+            synonyms._paraphrase_graph(
+                self.fake_graph, "A", ["foo"], False, False),
+            ["B", "C", "E", "D"])
+
+        self.assertItemsEqual(
+            synonyms._paraphrase_graph(
+                self.fake_graph, "A", ["foo"], True, True),
+            ["B", "C", "D"])
+
+        self.assertItemsEqual(
+            synonyms._paraphrase_graph(
+                self.fake_graph, "A", ["foo"], False, True),
+            ["B", "C", "D"])
+
     def test_paraphrase_graph_intersect_include(self):
         # intersection, includes unrend
         self.assertItemsEqual(
