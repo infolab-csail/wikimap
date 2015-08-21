@@ -15,6 +15,11 @@ $ git clone https://github.com/infolab-csail/wikimap.git
 $ cd wikimap
 wikimap$ python setup.py develop  # to get stay updated on new developments
 ```
+## Note on Graphing
+Since `matplotlib` is such a large dependency, but only necessary for graphing networks, it is not included by default. To graph networks, including those in the [iPython notebook](/../master/WikiMap%20Analysis.ipynb), simply install `matplotlib`:
+```Bash
+$ pip install matplotlib
+```
 
 # Usage
 The install gives you one Command Line Interface entrypoint called `wikimap`. All commands are run as subcommands of `wikimap`. You can run any subcommand by running:
