@@ -27,6 +27,7 @@ setup(
     ],
     tests_require=[
         'nose>=1.0',
+        'mock',
         'funcsigs'              # pip forced me to install this
     ],
     entry_points={

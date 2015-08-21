@@ -1,5 +1,6 @@
 import unittest
-from wikimap import synonyms
+import mock
+from wikimap import synonyms, graph
 
 
 class TestWordNetUtils(unittest.TestCase):
@@ -48,11 +49,12 @@ class TestIdSynset(unittest.TestCase):
 
 
 class TestSimilarity(unittest.TestCase):
+
     def test_intersect_ordered(self):
-        a = [5,4,3,2,1]
-        b = [1,3,5,6]
+        a = [5, 4, 3, 2, 1]
+        b = [1, 3, 5, 6]
         # assertEqual not assertItemsEqual b/c order matters
-        self.assertEqual(synonyms.intersect_ordered(a, b), [5,3,1])
+        self.assertEqual(synonyms.intersect_ordered(a, b), [5, 3, 1])
 
     def test_similarity_between_same(self):
         self.assertEqual(synonyms.similarity_between('bridge', 'bridge'),
@@ -90,11 +92,13 @@ class TestSimilarity(unittest.TestCase):
 
     def test_similar_enough_totally_unrelated(self):
         # 'YearInSpaceflight' and 'SupremeCourtOfTheUnitedStatesCase'
-        self.assertFalse(synonyms.similar_enough('year-in-spaceflight', 'scotus-case'))
-        self.assertFalse(synonyms.similar_enough('scotus-case', 'year-in-spaceflight'))
+        self.assertFalse(synonyms.similar_enough(
+            'year-in-spaceflight', 'scotus-case'))
+        self.assertFalse(synonyms.similar_enough(
+            'scotus-case', 'year-in-spaceflight'))
 
 
-class TestParaphrase(unittest.TestCase):
+class TestParaphraseUtils(unittest.TestCase):
 
     def test_post_paraphrase_cleanup(self):
         node_list = ['aA !!!!!prev!!!!!', 'next-date', 'A<<!!!!!prev!!!!!',
@@ -121,9 +125,66 @@ class TestParaphrase(unittest.TestCase):
                               expected_list)
 
     def test_post_paraphrase_cleanup_exclude_unrend(self):
-        node_list = ['lid', 'identifiers', 'iata', 'icao', 'wmo', 'faa', 'tc',
-                     'gps']
+        fake_graph = graph.WikiMap()
+        fake_graph.add_mapping("foo", "A", "B", False)
+        fake_graph.add_mapping("foo", "B", "C", False)
+        fake_graph.add_mapping("foo", "B", "D", False)
+        fake_graph.add_mapping("junk", "B", "C", False)
 
-        expected_list = ['identifiers']
-        self.assertItemsEqual(synonyms.post_paraphrase_cleanup(node_list, True),
-                              expected_list)
+        self.assertItemsEqual(
+            synonyms.post_paraphrase_cleanup(
+                ["A", "B", "C"], True, fake_graph),
+            ["B", "C"])
+
+
+class TestParaphrase(unittest.TestCase):
+
+    def setUp(self):
+        self.fake_graph = graph.WikiMap()
+        self.fake_graph.add_mapping("random", "A", "X", False)
+        self.fake_graph.add_mapping("bar", "F", "A", False)
+        self.fake_graph.add_mapping("bar", "E", "A", False)
+        self.fake_graph.add_mapping("foo", "E", "A", False)
+        self.fake_graph.add_mapping("foo", "A", "B", False)
+        self.fake_graph.add_mapping("bar", "E", "D", False)
+        self.fake_graph.add_mapping("junk", "E", "D", False)
+        self.fake_graph.add_mapping("foo", "B", "D", False)
+        self.fake_graph.add_mapping("foo", "B", "C", False)
+        self.fake_graph.add_mapping("junk", "B", "C", False)
+
+        patcher = mock.patch('wikimap.synonyms.similar_enough')
+        self.mock = patcher.start()  # patcher.start() RETURNS the mocked object
+        self.mock.side_effect = lambda x, y: x == y
+        self.addCleanup(patcher.stop)
+
+    def test_mocked_similar_enough(self):
+        self.assertTrue(synonyms.similar_enough('foo', 'foo'))
+        self.assertFalse(synonyms.similar_enough('foo', 'bar'))
+
+    def test_paraphrase_graph_intersect_include(self):
+        # intersection, includes unrend
+        self.assertItemsEqual(
+            synonyms._paraphrase_graph(
+                self.fake_graph, "A", ["foo", "bar"], True, False),
+            ["E", "D"])
+
+    def test_paraphrase_graph_union_include(self):
+        # union, includes unrend
+        self.assertItemsEqual(
+            synonyms._paraphrase_graph(
+                self.fake_graph, "A", ["foo", "bar"], False, False),
+            ["B", "C", "D", "E", "F"])
+
+    def test_paraphrase_graph_intersect_exclude(self):
+        # intersection, excludes unrend
+        self.assertItemsEqual(
+            synonyms._paraphrase_graph(
+                self.fake_graph, "A", ["foo", "bar"], True, True),
+            ["D"])
+
+    def test_paraphrase_graph_union_exclude(self):
+        # union, excludes unrend
+        self.assertItemsEqual(
+            synonyms._paraphrase_graph(
+                self.fake_graph, "A", ["foo", "bar"], False, True),
+            ["B", "C", "D"])

@@ -91,14 +91,35 @@ def similar_enough(infobox_first,
     return within_max_from_infobox and count_from_root >= min_from_root
 
 
-def post_paraphrase_cleanup(node_list, exclude_unrend):
+def post_paraphrase_cleanup(node_list, exclude_unrend, graph=master_graph):
     clean_list = [node for node in node_list if
                   '!!!!!' not in node and 'File:' not in node]
     if exclude_unrend:
         clean_list = [node for node in clean_list if
-                      master_graph.rendering_of_graph_node(node) != 'unrend']
+                      graph.rendering_of_graph_node(node) != 'unrend']
 
     return clean_list
+
+
+def _paraphrase_graph(graph, attribute, infoboxes_for_context,
+                      intersect, exclude_unrend):
+
+    subgraph = graph.connected_component_with_node(attribute)
+    list_of_lists = [[node for node in subgraph if
+                      any(similar_enough(infobox, context)
+                          for infobox in graph.infoboxes_of_graph_node(node))]
+                     for context in infoboxes_for_context]
+    if intersect:
+        # insersect the list_of_lists
+        preliminary_list = list(
+            set(list_of_lists[0]).intersection(*list_of_lists))
+    else:
+        # union the list_of_lists
+        preliminary_list = list(set().union(*list_of_lists))
+
+    preliminary_list.remove(attribute)
+
+    return post_paraphrase_cleanup(preliminary_list, exclude_unrend, graph)
 
 
 # As of now, once this function returns paraphrases from Wikipedia
@@ -119,16 +140,5 @@ def paraphrase(attribute, infoboxes_for_context,
     precise?) paraphrases
     """
 
-    subgraph = master_graph.connected_component_with_node(attribute)
-    list_of_lists = [[node for node in subgraph if
-                      any(similar_enough(infobox, context)
-                          for infobox in master_graph.infoboxes_of_graph_node(node))]
-                     for context in infoboxes_for_context]
-    if intersect:
-        # insersect the list_of_lists
-        preliminary_list = list(set(list_of_lists[0]).intersection(*list_of_lists))
-    else:
-        # union the list_of_lists
-        preliminary_list = list(set().union(*list_of_lists))
-
-    return post_paraphrase_cleanup(preliminary_list, exclude_unrend)
+    return _paraphrase_graph(master_graph, attribute, infoboxes_for_context,
+                             intersect, exclude_unrend)
