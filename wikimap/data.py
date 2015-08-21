@@ -32,10 +32,12 @@ def get_infobox_totals(path):
     names = sheet.col_values(0, 2)  # 0th col, starting at 2nd row
 
     # makes a template name formal according to wikipedia
-    formal_name = lambda cell: 'Template:Infobox ' + str(cell).replace('-', ' ')
+    formal_name = lambda cell: 'Template:Infobox ' + \
+        str(cell).replace('-', ' ')
 
     # if an integer float turn into integer; else leave it alone
-    int_integer = lambda name: int(name) if isinstance(name, float) and name.is_integer() else name
+    int_integer = lambda name: int(name) if isinstance(
+        name, float) and name.is_integer() else name
 
     formal_names = [formal_name(int_integer(cell)) for cell in names]
 

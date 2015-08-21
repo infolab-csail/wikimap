@@ -76,6 +76,7 @@ def analyze_explosion(G, excel, explosion_report):
     for x in sortedInfoboxes:
         print x
 
+
 def status(graph, explosion_report, excel, empty_report):
     G = data.read_graph(graph)
 
@@ -92,13 +93,15 @@ def status(graph, explosion_report, excel, empty_report):
 
 
 def main(argv):
-    parser = argparse.ArgumentParser(prog='status', description='Show stats about WikiMap')
+    parser = argparse.ArgumentParser(
+        prog='status', description='Show stats about WikiMap')
     parser.add_argument("graph", help="path to input network graph file")
     parser.add_argument("excel",
                         help="path to input excel of infobox templates")
     parser.add_argument("empty_report",
                         help="path to JSON output file for empty report")
-    parser.add_argument("explosion_report", help="path to JSON output file for explosion report")
+    parser.add_argument("explosion_report",
+                        help="path to JSON output file for explosion report")
     args = parser.parse_args(argv)
     status(args.graph, args.explosion_report, args.excel, args.empty_report)
 

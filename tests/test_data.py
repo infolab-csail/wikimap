@@ -32,7 +32,8 @@ class TestInfoboxData(unittest.TestCase):
     def test_total_infoboxes(self):
         total_infoboxes = 5
 
-        self.assertEqual(data._total_infoboxes(self.fake_data), total_infoboxes)
+        self.assertEqual(data._total_infoboxes(
+            self.fake_data), total_infoboxes)
 
     def test_total_pages(self):
         total_pages = 354090.0 + 146915.0 + 122492.0 + 118713.0 + 5.0

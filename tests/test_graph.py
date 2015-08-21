@@ -196,14 +196,14 @@ class TestInsertingInformation(unittest.TestCase):
         self.G.add_rendering('Infobox baz bang', 'hybrid', 'rend')
 
         self.assertEqual(self.G.node['unrend']['infobox'],
-                              {'Infobox foo bar': ['unrend']})
+                         {'Infobox foo bar': ['unrend']})
 
         self.assertEqual(self.G.node['hybrid']['infobox'],
-                              {'Infobox foo bar': ['rend'],
-                               'Infobox baz bang': ['unrend']})
+                         {'Infobox foo bar': ['rend'],
+                          'Infobox baz bang': ['unrend']})
 
         self.assertEqual(self.G.node['rend']['infobox'],
-                              {'Infobox baz bang': ['rend']})
+                         {'Infobox baz bang': ['rend']})
 
     def test_add_rendering_with_both(self):
         self.G.add_edge('unrend', 'hybrid')
@@ -213,13 +213,13 @@ class TestInsertingInformation(unittest.TestCase):
         self.G.add_rendering('Infobox foo bar', 'hybrid', 'rend')
 
         self.assertEqual(self.G.node['unrend']['infobox'],
-                              {'Infobox foo bar': ['unrend']})
+                         {'Infobox foo bar': ['unrend']})
 
         self.assertEqual(self.G.node['hybrid']['infobox'],
-                              {'Infobox foo bar': ['rend', 'unrend']})
+                         {'Infobox foo bar': ['rend', 'unrend']})
 
         self.assertEqual(self.G.node['rend']['infobox'],
-                              {'Infobox foo bar': ['rend']})
+                         {'Infobox foo bar': ['rend']})
 
     def test_add_rendering_with_both_no_overwrite(self):
         self.G.add_edge("A", "B")
@@ -231,16 +231,16 @@ class TestInsertingInformation(unittest.TestCase):
         self.G.add_rendering("foo", "B", "D")
 
         self.assertEqual(self.G.node['A']['infobox'],
-                              {'foo': ['unrend']})
+                         {'foo': ['unrend']})
 
         self.assertEqual(self.G.node['B']['infobox'],
-                              {'foo': ['rend', 'unrend']})
+                         {'foo': ['rend', 'unrend']})
 
         self.assertEqual(self.G.node['C']['infobox'],
-                              {'foo': ['rend']})
+                         {'foo': ['rend']})
 
         self.assertEqual(self.G.node['D']['infobox'],
-                              {'foo': ['rend']})
+                         {'foo': ['rend']})
 
     def test_add_infobox(self):
         self.G.add_edge('unrend', 'rend')
@@ -258,9 +258,9 @@ class TestInsertingInformation(unittest.TestCase):
         self.assertItemsEqual(self.G.edges(), [('_unrend_', '_rend_')])
 
         self.assertEqual(self.G.node['_unrend_']['infobox'],
-                              {'Infobox foo bar': ['unrend']})
+                         {'Infobox foo bar': ['unrend']})
         self.assertEqual(self.G.node['_rend_']['infobox'],
-                              {'Infobox foo bar': ['rend']})
+                         {'Infobox foo bar': ['rend']})
 
         self.assertItemsEqual(self.G.edge['_unrend_']['_rend_']['infobox'],
                               ['Infobox foo bar'])
@@ -272,9 +272,9 @@ class TestInsertingInformation(unittest.TestCase):
         self.assertItemsEqual(self.G.edges(), [('unrend', 'rend')])
 
         self.assertEqual(self.G.node['unrend']['infobox'],
-                              {'Infobox foo bar': ['unrend']})
+                         {'Infobox foo bar': ['unrend']})
         self.assertEqual(self.G.node['rend']['infobox'],
-                              {'Infobox foo bar': ['rend']})
+                         {'Infobox foo bar': ['rend']})
 
         self.assertItemsEqual(self.G.edge['unrend']['rend']['infobox'],
                               ['Infobox foo bar'])
@@ -326,6 +326,7 @@ class TestFetchingInformation(unittest.TestCase):
 
 
 class TestAnalytics(unittest.TestCase):
+
     def test_connected_component_nodes_with_size(self):
         G = graph.WikiMap()
 
