@@ -6,11 +6,11 @@ from wikimap import data
 class TestInfoboxData(unittest.TestCase):
 
     def setUp(self):
-        self.fake_data = {"Template:Infobox settlement": 354090.0,
-                          "Template:Infobox person": 146915.0,
-                          "Template:Infobox album": 122492.0,
-                          "Template:Infobox football biography": 118713.0,
-                          "Template:Infobox 2011": 5.0}
+        self.fake_data = {"settlement": 354090.0,
+                          "person": 146915.0,
+                          "album": 122492.0,
+                          "football-biography": 118713.0,
+                          "2011": 5.0}
 
     def test_get_infobox_totals(self):
         path = "tests/fake_data/test_infoboxes.xlsx"
@@ -21,11 +21,11 @@ class TestInfoboxData(unittest.TestCase):
         self.assertTrue(os.path.isfile(path))
 
     def test_get_infoboxes(self):
-        infoboxes = ["Template:Infobox settlement",
-                     "Template:Infobox person",
-                     "Template:Infobox album",
-                     "Template:Infobox football biography",
-                     "Template:Infobox 2011"]
+        infoboxes = ["settlement",
+                     "person",
+                     "album",
+                     "football-biography",
+                     "2011"]
 
         self.assertItemsEqual(data._get_infoboxes(self.fake_data), infoboxes)
 
