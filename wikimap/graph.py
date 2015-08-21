@@ -164,7 +164,7 @@ class WikiMap(nx.DiGraph):
     def add_to_field(location, field, value):
         if (field in location.keys()) and (value not in location[field]):
             location[field].append(value)
-        else:
+        elif field not in location.keys():
             location[field] = [value]
 
     def add_uncleaned(self, unrend, rend):
