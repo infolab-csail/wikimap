@@ -126,7 +126,8 @@ def _paraphrase_graph(graph, attribute, infoboxes_for_context,
         # union the list_of_lists
         preliminary_list = list(set().union(*list_of_lists))
 
-    preliminary_list.remove(attribute)
+    if attribute in preliminary_list:
+        preliminary_list.remove(attribute)
 
     return post_paraphrase_cleanup(preliminary_list, exclude_unrend, graph)
 
