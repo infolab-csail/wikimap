@@ -15,6 +15,11 @@ $ git clone https://github.com/infolab-csail/wikimap.git
 $ cd wikimap
 wikimap$ python setup.py develop  # to get stay updated on new developments
 ```
+## Note on Graphing
+Since `matplotlib` is such a large dependency, but only necessary for graphing networks, it is not included by default. To graph networks, including those in the [iPython notebook](/../master/WikiMap%20Analysis.ipynb), simply install `matplotlib`:
+```Bash
+$ pip install matplotlib
+```
 
 # Usage
 The install gives you one Command Line Interface entrypoint called `wikimap`. All commands are run as subcommands of `wikimap`. You can run any subcommand by running:
@@ -37,9 +42,6 @@ Major subcommands:
 
 ## `status`
 `wikimap status <OPTIONS>` prints statistics and information about an existant graph.
-
-## `capture`
-`wikimap capture <OPTIONS>` creates images, such as the one at the beginning of this README, of all separate subgraphs in an existant graph. 
 
 ## `babble`
 `wikimap babble <OPTIONS>` prints all of the nodes in a graph. This command is commonly used in conjunction with a redirect into a file, e.g. `wikimap babble <OPTIONS> > my-output-file.txt`

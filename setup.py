@@ -17,7 +17,6 @@ setup(
         'unidecode',
         'nltk',
         'networkx',
-        'matplotlib',
         'wikipediabase',
         'defexpand'
     ],

@@ -1,6 +1,6 @@
 import argparse
 import sys
-from wikimap import babble, capture, create, status
+from wikimap import babble, create, status
 
 
 def main():
@@ -11,10 +11,6 @@ def main():
 
     parser_babble = subparsers.add_parser('babble', help='Print nodenames')
     parser_babble.set_defaults(func=babble.main)
-
-    parser_capture = subparsers.add_parser(
-        'capture', help='Capture images of subgraphs')
-    parser_capture.set_defaults(func=capture.main)
 
     parser_create = subparsers.add_parser('create', help='Create a WikiMap')
     parser_create.set_defaults(func=create.main)
