@@ -30,7 +30,8 @@ def create_graph(infoboxes, clean):
 
 
 def main(argv):
-    parser = argparse.ArgumentParser(prog='create', description='Create a WikiMap')
+    parser = argparse.ArgumentParser(
+        prog='create', description='Create a WikiMap')
     parser.add_argument("-c", "--clean",
                         help="make graph with clean nodes",
                         action="store_true")

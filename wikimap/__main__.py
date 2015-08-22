@@ -2,6 +2,7 @@ import argparse
 import sys
 from wikimap import babble, create, status
 
+
 def main():
     parser = argparse.ArgumentParser(
         description='Identifies contextual synonyms of Wikipedia Infobox attributes.')
@@ -14,7 +15,8 @@ def main():
     parser_create = subparsers.add_parser('create', help='Create a WikiMap')
     parser_create.set_defaults(func=create.main)
 
-    parser_status = subparsers.add_parser('status', help='Show stats about WikiMap')
+    parser_status = subparsers.add_parser(
+        'status', help='Show stats about WikiMap')
     parser_status.set_defaults(func=status.main)
 
     args = parser.parse_args(sys.argv[1:2])

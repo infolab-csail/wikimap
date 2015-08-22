@@ -1,11 +1,12 @@
 from defexpand import infoclass
 from nltk.corpus import wordnet as wn
-from nltk.stem import WordNetLemmatizer
 import nltk.tag
 from unidecode import unidecode
+from wikimap import data, graph
+from wikimap.config import DATA_DIRECTORY
 
 ontology = infoclass.get_info_ontology()
-lemmatizer = WordNetLemmatizer()
+master_graph = data.read_graph(DATA_DIRECTORY + "wikimap.gpickle")
 
 
 def clean_wordnet(word):
@@ -52,61 +53,102 @@ def similarity_between(infobox_first, infobox_second):
     _above_first = ontology.classes_above_infobox(infobox_first)
     _above_second = ontology.classes_above_infobox(infobox_second)
 
-    # get lowest shared class in DBpedia ontology tree
-    shared_dbpedia_class = intersect_ordered(_above_first, _above_second)[0]
+    if _above_first == []:
+        raise KeyError("non-existant class: " + infobox_first)
+    elif _above_second == []:
+        raise KeyError("non-existant class: " + infobox_second)
+    else:
+        # get lowest shared class in DBpedia ontology tree
+        shared_dbpedia_class = intersect_ordered(_above_first, _above_second)[0]
 
-    # count classes above the infobox's immediate class
-    # (if they are the same, counts will =0)
-    count_from_first = _above_first.index(shared_dbpedia_class)
-    count_from_second = _above_second.index(shared_dbpedia_class)
+        # count classes above the infobox's immediate class
+        # (if they are the same, counts will =0)
+        count_from_first = _above_first.index(shared_dbpedia_class)
+        count_from_second = _above_second.index(shared_dbpedia_class)
 
-    # counts includes the root (if they only share root, then count_from_root=0)
-    _above_shared = ontology.classes_above(shared_dbpedia_class)
-    count_from_root = len(_above_shared) - 1 # so root = 0
+        # counts includes the root (if they only share root, then
+        # count_from_root=0)
+        _above_shared = ontology.classes_above(shared_dbpedia_class)
+        count_from_root = len(_above_shared) - 1  # so root = 0
 
-    return [shared_dbpedia_class, count_from_root,
-            count_from_first, count_from_second]
+        return [shared_dbpedia_class, count_from_root,
+                count_from_first, count_from_second]
 
 
 def similar_enough(infobox_first,
                    infobox_second,
-                   min_from_root = 1,
-                   max_from_either_infobox = 2):
+                   min_from_root=1,
+                   max_from_either_infobox=2):
                    # special_cases = True):
-    _similarity_between = similarity_between(infobox_first, infobox_second)
-    [shared_dbpedia_class, count_from_root,
-     count_from_first, count_from_second] = _similarity_between
-
-    # very_general_classes = ['Agent', 'Event', 'Place']
-    # _is_special = shared_dbpedia_class in very_general_classes
-
-    # if max_from_either_infobox == 2 and _is_special and special_cases:
-    #    max_from_either_infobox = 3
-
-    within_max_from_infobox = (count_from_first <= max_from_either_infobox and
-                               count_from_second <= max_from_either_infobox)
-
-    return within_max_from_infobox and count_from_root >= min_from_root
-
-def get_wordnet_pos(treebank_tag):
-    if treebank_tag.startswith('J'):
-        return wn.ADJ
-    elif treebank_tag.startswith('V'):
-        return wn.VERB
-    elif treebank_tag.startswith('N'):
-        return wn.NOUN
-    elif treebank_tag.startswith('R'):
-        return wn.ADV
+    try:
+        _similarity_between = similarity_between(infobox_first, infobox_second)
+    except KeyError:
+        return False
     else:
-        raise KeyError("Treebank contains no such tag: " + treebank_tag)
+        [shared_dbpedia_class, count_from_root,
+         count_from_first, count_from_second] = _similarity_between
+
+        # very_general_classes = ['Agent', 'Event', 'Place']
+        # _is_special = shared_dbpedia_class in very_general_classes
+
+        # if max_from_either_infobox == 2 and _is_special and special_cases:
+        #    max_from_either_infobox = 3
+
+        within_max_from_infobox = (count_from_first <= max_from_either_infobox and
+                                   count_from_second <= max_from_either_infobox)
+
+        return within_max_from_infobox and count_from_root >= min_from_root
 
 
-def auto_lemmatize(word):
-    # TODO: this handles single words nicely, but cannot do 'maintained by'
-    tagged = nltk.pos_tag([word])[0]
-    treebank_pos = tagged[1]
-    return lemmatizer.lemmatize(word, get_wordnet_pos(treebank_pos))
+def post_paraphrase_cleanup(node_list, exclude_unrend, graph=master_graph):
+    clean_list = [node for node in node_list if
+                  '!!!!!' not in node and 'File:' not in node]
+    if exclude_unrend:
+        clean_list = [node for node in clean_list if
+                      graph.rendering_of_graph_node(node) != 'unrend']
+
+    return clean_list
 
 
-# def get_synonyms(object_class, property, value_class):
-#     # stub
+def _paraphrase_graph(graph, attribute, infoboxes_for_context,
+                      intersect, exclude_unrend):
+
+    subgraph = graph.connected_component_with_node(attribute)
+    list_of_lists = [[node for node in subgraph if
+                      any(similar_enough(infobox, context)
+                          for infobox in graph.infoboxes_of_graph_node(node))]
+                     for context in infoboxes_for_context]
+    if intersect:
+        # insersect the list_of_lists
+        preliminary_list = list(
+            set(list_of_lists[0]).intersection(*list_of_lists))
+    else:
+        # union the list_of_lists
+        preliminary_list = list(set().union(*list_of_lists))
+
+    if attribute in preliminary_list:
+        preliminary_list.remove(attribute)
+
+    return post_paraphrase_cleanup(preliminary_list, exclude_unrend, graph)
+
+
+# As of now, once this function returns paraphrases from Wikipedia
+# (through the WikiMap), it does not use WordNet to get more
+# paraphrases. In order to do that, the paraphrases will have to first
+# run through Loc's infoboxToTexps to be stemmed, lemmatized, etc.
+def paraphrase(attribute, infoboxes_for_context,
+               intersect=False, exclude_unrend=True):
+    """Given an attribute (str) from a Wikipedia infobox and a list of
+    infoboxes to use for context-searching, return other attributes
+    (and their infobox?) as paraphrases. If attribute does not exist,
+    will raise NetworkXError
+
+    Note on 'intersect' boolean. To be considered: should I do an
+    intersection of attributes appropriate for each infobox context,
+    or a union? In other words, should more infoboxes_for_context lead
+    to less (but more precise) paraphrases, or more (but less
+    precise?) paraphrases
+    """
+
+    return _paraphrase_graph(master_graph, attribute, infoboxes_for_context,
+                             intersect, exclude_unrend)

@@ -25,44 +25,67 @@ class TestGeneralNetworkMethods(unittest.TestCase):
         # two node group
         self.G.add_edge("M", "N")
 
+        # EXPECTED:
+        # three node group
+        self.expected_three1 = graph.WikiMap()
+        self.expected_three1.add_edge("Y", "X")
+        self.expected_three1.add_edge("X", "Y")
+        self.expected_three1.add_edge("Z", "X")
+        self.expected_three1.add_edge("X", "Z")
+
+        # three node group (another)
+        self.expected_three2 = graph.WikiMap()
+        self.expected_three2.add_edge("alpha", "beta")
+        self.expected_three2.add_edge("beta", "alpha")
+        self.expected_three2.add_edge("alpha", "gamma")
+        self.expected_three2.add_edge("gamma", "alpha")
+
+        # four node group
+        self.expected_four = graph.WikiMap()
+        self.expected_four.add_edge("A", "B")
+        self.expected_four.add_edge("B", "A")
+        self.expected_four.add_edge("A", "C")
+        self.expected_four.add_edge("C", "A")
+        self.expected_four.add_edge("D", "C")
+        self.expected_four.add_edge("C", "D")
+        # because directionality of graph lost in process
+
     def test_connected_component_lengths(self):
         self.assertItemsEqual(
             self.G.connected_component_lengths(), [2, 3, 3, 4])
 
     def test_connected_component_statistics(self):
-        self.assertItemsEqual(
+        self.assertEqual(
             self.G.connected_component_statistics(), {2: 1, 3: 2, 4: 1})
 
     def test_connected_components_with_size(self):
-        # three node group
-        expected_three1 = graph.WikiMap()
-        expected_three1.add_edge("Y", "X")
-        expected_three1.add_edge("Z", "X")
-
-        # three node group (another)
-        expected_three2 = graph.WikiMap()
-        expected_three2.add_edge("alpha", "beta")
-        expected_three2.add_edge("alpha", "gamma")
-
-        # four node group
-        expected_four = graph.WikiMap()
-        expected_four.add_edge("A", "B")
-        expected_four.add_edge("B", "A")
-        expected_four.add_edge("A", "C")
-        expected_four.add_edge("C", "A")
-        expected_four.add_edge("D", "C")
-        expected_four.add_edge("C", "D")
-        # because directionality of graph lost in process
-
         self.assertEqual(len(self.G.connected_components_with_size(3)),
-                         len([expected_three1, expected_three2]))
+                         len([self.expected_three1, self.expected_three2]))
         # unfortunately cannot test that two lists of graphs are
         # equal, so only test length of lists here, and then that the
         # graph in the list of len=1 below is equal. Hopefully this is
         # enough.
 
         returned_four = self.G.connected_components_with_size(4)[0]
-        nxt.assert_graphs_equal(returned_four, expected_four)
+        nxt.assert_graphs_equal(returned_four, self.expected_four)
+
+    def test_connected_component_with_node(self):
+        # "X" is a hub
+        returned_three1 = self.G.connected_component_with_node("X")
+        nxt.assert_graphs_equal(returned_three1, self.expected_three1)
+
+        # "beta" is not a hub
+        returned_three2 = self.G.connected_component_with_node("beta")
+        nxt.assert_graphs_equal(returned_three2, self.expected_three2)
+
+        # "A" is a hub
+        returned_four = self.G.connected_component_with_node("A")
+        nxt.assert_graphs_equal(returned_four, self.expected_four)
+
+    def test_connected_component_with_node_not_found(self):
+        self.assertRaisesRegexp(
+            nx.exception.NetworkXError, "Node \"junk\" not in graph",
+            self.G.connected_component_with_node, "junk")
 
 
 class TestCleaningNodes(unittest.TestCase):
@@ -126,23 +149,28 @@ class TestAddToField(unittest.TestCase):
 
     def test_add_to_existing_field_new(self):
         graph.WikiMap.add_to_field(self.test_dict[1], "foo", "aba")
-        self.assertItemsEqual(self.test_dict[1], {"foo": ["bar", "aba"]})
+        self.assertEqual(self.test_dict[1], {"foo": ["bar", "aba"]})
 
     def test_add_to_existing_field_existing(self):
         graph.WikiMap.add_to_field(self.test_dict[1], "foo", "bar")
-        self.assertItemsEqual(self.test_dict[1], {"foo": ["bar"]})
+        self.assertEqual(self.test_dict[1], {"foo": ["bar"]})
+
+    def test_add_to_existing_field_no_overwrite(self):
+        graph.WikiMap.add_to_field(self.test_dict[1], "foo", "aba")
+        graph.WikiMap.add_to_field(self.test_dict[1], "foo", "bar")
+        self.assertEqual(self.test_dict[1], {"foo": ["bar", "aba"]})
 
     def test_add_to_new_field(self):
         graph.WikiMap.add_to_field(self.test_dict[1], "bar", "aba")
-        self.assertItemsEqual(
+        self.assertEqual(
             self.test_dict[1], {"foo": ["bar"], "bar": ["aba"]})
 
     def test_add_to_new_location(self):
         self.test_dict[1]['infobox'] = {}
         graph.WikiMap.add_to_field(
             self.test_dict[1]['infobox'], "bar", "aba")
-        self.assertItemsEqual(self.test_dict[1], {"foo": ["bar"],
-                                                  "infobox": {"bar": ["aba"]}})
+        self.assertEqual(self.test_dict[1], {"foo": ["bar"],
+                                             "infobox": {"bar": ["aba"]}})
 
 
 class TestInsertingInformation(unittest.TestCase):
@@ -167,15 +195,15 @@ class TestInsertingInformation(unittest.TestCase):
         self.G.add_rendering('Infobox foo bar', 'unrend', 'hybrid')
         self.G.add_rendering('Infobox baz bang', 'hybrid', 'rend')
 
-        self.assertItemsEqual(self.G.node['unrend']['infobox'],
-                              {'Infobox foo bar': ['unrend']})
+        self.assertEqual(self.G.node['unrend']['infobox'],
+                         {'Infobox foo bar': ['unrend']})
 
-        self.assertItemsEqual(self.G.node['hybrid']['infobox'],
-                              {'Infobox foo bar': ['rend'],
-                               'Infobox baz bang': ['unrend']})
+        self.assertEqual(self.G.node['hybrid']['infobox'],
+                         {'Infobox foo bar': ['rend'],
+                          'Infobox baz bang': ['unrend']})
 
-        self.assertItemsEqual(self.G.node['rend']['infobox'],
-                              {'Infobox baz bang': ['rend']})
+        self.assertEqual(self.G.node['rend']['infobox'],
+                         {'Infobox baz bang': ['rend']})
 
     def test_add_rendering_with_both(self):
         self.G.add_edge('unrend', 'hybrid')
@@ -184,14 +212,35 @@ class TestInsertingInformation(unittest.TestCase):
         self.G.add_rendering('Infobox foo bar', 'unrend', 'hybrid')
         self.G.add_rendering('Infobox foo bar', 'hybrid', 'rend')
 
-        self.assertItemsEqual(self.G.node['unrend']['infobox'],
-                              {'Infobox foo bar': ['unrend']})
+        self.assertEqual(self.G.node['unrend']['infobox'],
+                         {'Infobox foo bar': ['unrend']})
 
-        self.assertItemsEqual(self.G.node['hybrid']['infobox'],
-                              {'Infobox foo bar': ['unrend', 'rend']})
+        self.assertEqual(self.G.node['hybrid']['infobox'],
+                         {'Infobox foo bar': ['rend', 'unrend']})
 
-        self.assertItemsEqual(self.G.node['rend']['infobox'],
-                              {'Infobox foo bar': ['rend']})
+        self.assertEqual(self.G.node['rend']['infobox'],
+                         {'Infobox foo bar': ['rend']})
+
+    def test_add_rendering_with_both_no_overwrite(self):
+        self.G.add_edge("A", "B")
+        self.G.add_edge("B", "C")
+        self.G.add_edge("B", "D")
+
+        self.G.add_rendering("foo", "A", "B")
+        self.G.add_rendering("foo", "B", "C")
+        self.G.add_rendering("foo", "B", "D")
+
+        self.assertEqual(self.G.node['A']['infobox'],
+                         {'foo': ['unrend']})
+
+        self.assertEqual(self.G.node['B']['infobox'],
+                         {'foo': ['rend', 'unrend']})
+
+        self.assertEqual(self.G.node['C']['infobox'],
+                         {'foo': ['rend']})
+
+        self.assertEqual(self.G.node['D']['infobox'],
+                         {'foo': ['rend']})
 
     def test_add_infobox(self):
         self.G.add_edge('unrend', 'rend')
@@ -203,17 +252,17 @@ class TestInsertingInformation(unittest.TestCase):
                               ['Infobox foo bar', 'Infobox baz bang'])
 
     def test_add_mapping_no_clean(self):
-        self.G.add_mapping('Infobox foo bar', 'unrend', 'rend', False)
+        self.G.add_mapping('Infobox foo bar', '_unrend_', '_rend_', False)
 
-        self.assertItemsEqual(self.G.nodes(), ['unrend', 'rend'])
-        self.assertItemsEqual(self.G.edges(), [('unrend', 'rend')])
+        self.assertItemsEqual(self.G.nodes(), ['_unrend_', '_rend_'])
+        self.assertItemsEqual(self.G.edges(), [('_unrend_', '_rend_')])
 
-        self.assertItemsEqual(self.G.node['unrend']['infobox'],
-                              {'Infobox foo bar': ['unrend']})
-        self.assertItemsEqual(self.G.node['rend']['infobox'],
-                              {'Infobox foo bar': ['rend']})
+        self.assertEqual(self.G.node['_unrend_']['infobox'],
+                         {'Infobox foo bar': ['unrend']})
+        self.assertEqual(self.G.node['_rend_']['infobox'],
+                         {'Infobox foo bar': ['rend']})
 
-        self.assertItemsEqual(self.G.edge['unrend']['rend']['infobox'],
+        self.assertItemsEqual(self.G.edge['_unrend_']['_rend_']['infobox'],
                               ['Infobox foo bar'])
 
     def test_add_mapping_with_clean(self):
@@ -222,10 +271,10 @@ class TestInsertingInformation(unittest.TestCase):
         self.assertItemsEqual(self.G.nodes(), ['unrend', 'rend'])
         self.assertItemsEqual(self.G.edges(), [('unrend', 'rend')])
 
-        self.assertItemsEqual(self.G.node['unrend']['infobox'],
-                              {'Infobox foo bar': ['unrend']})
-        self.assertItemsEqual(self.G.node['rend']['infobox'],
-                              {'Infobox foo bar': ['rend']})
+        self.assertEqual(self.G.node['unrend']['infobox'],
+                         {'Infobox foo bar': ['unrend']})
+        self.assertEqual(self.G.node['rend']['infobox'],
+                         {'Infobox foo bar': ['rend']})
 
         self.assertItemsEqual(self.G.edge['unrend']['rend']['infobox'],
                               ['Infobox foo bar'])
@@ -277,6 +326,7 @@ class TestFetchingInformation(unittest.TestCase):
 
 
 class TestAnalytics(unittest.TestCase):
+
     def test_connected_component_nodes_with_size(self):
         G = graph.WikiMap()
 

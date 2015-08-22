@@ -31,13 +31,11 @@ def get_infobox_totals(path):
     # get the names
     names = sheet.col_values(0, 2)  # 0th col, starting at 2nd row
 
-    # makes a template name formal according to wikipedia
-    formal_name = lambda cell: 'Template:Infobox ' + str(cell).replace('-', ' ')
-
     # if an integer float turn into integer; else leave it alone
-    int_integer = lambda name: int(name) if isinstance(name, float) and name.is_integer() else name
+    int_integer = lambda name: int(name) if isinstance(
+        name, float) and name.is_integer() else name
 
-    formal_names = [formal_name(int_integer(cell)) for cell in names]
+    formal_names = [str(int_integer(cell)) for cell in names]
 
     # get the number of pages for each name
     numbers = sheet.col_values(1, 2)  # 1th col, starting at 2nd row
@@ -48,7 +46,9 @@ def get_infobox_totals(path):
 
 def get_single_mappings(infobox):
     """Given one infobox, return its attribute mappings"""
-    return get_meta_infobox(infobox).rendered_keys()
+    formal_name = lambda cell: 'Template:Infobox ' + \
+        str(cell).replace('-', ' ')
+    return get_meta_infobox(formal_name(infobox)).rendered_keys()
 
 
 def get_all_mappings(path):

@@ -85,6 +85,20 @@ class WikiMap(nx.DiGraph):
 
         return components
 
+    def connected_component_with_node(self, node):
+        """Return the component that contains a given node
+        WARNING: directionality of graph lost in process
+        """
+        component = [x for x in nx.connected_component_subgraphs(
+            self.return_undirected()) if node in x.nodes()]
+        if len(component) == 1:
+            component = component[0]
+            WikiMap.convert_to_special(component)
+            return component
+        else:
+            raise nx.exception.NetworkXError(
+                "Node \"" + node + "\" not in graph")
+
     # SPECIFIC WIKI INFOBOX/ATTRIBUTE METHODS:
 
     # FETCHING INFORMATION
@@ -150,7 +164,7 @@ class WikiMap(nx.DiGraph):
     def add_to_field(location, field, value):
         if (field in location.keys()) and (value not in location[field]):
             location[field].append(value)
-        else:
+        elif field not in location.keys():
             location[field] = [value]
 
     def add_uncleaned(self, unrend, rend):
@@ -177,7 +191,7 @@ class WikiMap(nx.DiGraph):
     def add_mapping(self, infobox, unrend, rend, clean):
         """Add mapping for [infobox] (str) between [unrendered] (str) and
         [rendered] (str) to the specified [graph] (WikiMap object)"""
-        if WikiMap.clean:
+        if clean:
             self.add_uncleaned(unrend, rend)
             unrend = WikiMap.clean(unrend)
             rend = WikiMap.clean(rend)
