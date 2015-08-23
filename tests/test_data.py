@@ -20,6 +20,10 @@ class TestInfoboxData(unittest.TestCase):
         # make sure the file is actually there
         self.assertTrue(os.path.isfile(path))
 
+    def test_get_formal_name(self):
+        self.assertEqual(data.get_formal_name('foo-bar'),
+                         'Template:Infobox foo bar')
+
     def test_get_infoboxes(self):
         infoboxes = ["settlement",
                      "person",
