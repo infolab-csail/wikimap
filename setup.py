@@ -21,7 +21,7 @@ setup(
         'defexpand'
     ],
     dependency_links=[
-        'git+https://github.com/fakedrake/wikipediabase.git#egg=wikipediabase',
+        'git+https://github.com/infolab-csail/wikipediabase.git#egg=wikipediabase',
         'git+https://github.com/infolab-csail/defexpand.git#egg=defexpand'
     ],
     tests_require=[
