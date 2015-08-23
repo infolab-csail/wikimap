@@ -50,7 +50,10 @@ def get_formal_name(infobox):
 
 def get_single_mappings(infobox):
     """Given one infobox, return its attribute mappings"""
-    return get_meta_infobox(get_formal_name(infobox)).rendered_keys()
+    try:
+        return get_meta_infobox(get_formal_name(infobox)).rendered_keys()
+    except LookupError:
+        return {}
 
 
 def get_all_mappings(path):
