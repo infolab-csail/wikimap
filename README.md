@@ -27,7 +27,9 @@ The primary end-product of WikiMap is to paraphrase Wikipedia infobox attributes
 >>> from wikimap import synonyms
 >>> synonyms.paraphrase("attribute", ["infobox", "other-infobox"])
 ```
-Infobox names are case-insensitive, but require dashes instead of spaces. Attribute names have no special requirements, and can have spaces if they so appear on Wikipedia.
+Infobox names are case-insensitive, but require dashes instead of spaces. Attribute names have no special requirements, and can have spaces if they so appear on Wikipedia. If the attribute does not exist, `paraphrase()` will throw a `KeyError`. 
+
+`paraphrase()` returns a list of unmodified paraphrases. This means the paraphrases are not stemmed, lemmatized, etc. If no paraphrases are found, pharaphrase will return an empty list.
 
 As of now, the behavior with multiple infoboxes is: paraphrase for each infobox separately, and union all paraphrases. Intersection is possible if you pass `intersect=True` as an optional argument:
 ```Python
