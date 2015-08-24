@@ -25,7 +25,7 @@ $ pip install matplotlib
 The primary end-product of WikiMap is to paraphrase Wikipedia infobox attributes given some infoboxes as "context" for the paraphrase. You can get this for free simply by **importing WikiMap as a library**:
 ```Python
 >>> from wikimap import synonyms
->>> synonyms.paraphrase("attribute", ["infobox", "other-infobox"])
+>>> synonyms.paraphrase("attribute", ["infobox", "other-infobox", ...])
 ```
 Infobox names are case-insensitive, but require dashes instead of spaces. Attribute names have no special requirements, and can have spaces if they so appear on Wikipedia. If the attribute does not exist, `paraphrase()` will throw a `KeyError`. 
 
@@ -42,6 +42,51 @@ By default, unrendered attributes are not given as paraphrases. If you want to s
 Of course, you can also combine multiple optional arguments together, e.g. 
 ```Python
 >>> synonyms.paraphrase("attribute", ["infobox", "other-infobox"], intersect=True, exclude_unrend=False)
+```
+
+## WordNet Synsets
+Another useful tool built into WikiMap is the ability to augment the paraphrase data with synonyms from [WordNet](http://wordnetweb.princeton.edu/perl/webwn). To get started, first install the WordNet corpus:
+```Bash
+$ python2.7 -c "import nltk; nltk.download('wordnet');"
+```
+To get synonyms from WordNet, WikiMap comes with the `id_synset()` function. Normally, WordNet has many synsets for each word, each for a different usage of the word. To overcome this problem, `id_synset()` allows you to give "example" synonyms (one or more) for a word, and `id_synset()` will return a list similar synonyms. Here are some examples:
+```Python
+>>> from wikimap import synonyms
+>>> synonyms.id_synset('dog', ['canis familiaris'])
+['dog', 'domestic dog', 'canis familiaris']
+
+>>> synonyms.id_synset('dog', ['wiener'])
+['frank', 'frankfurter', 'hotdog', 'hot dog', 'dog', 'wiener', 'wienerwurst', 'weenie']
+
+>>> synonyms.id_synset('maintain', ['sustain'])
+['sustain', 'keep', 'maintain']
+
+>>> synonyms.id_synset('maintain', ['assert'])
+['assert', 'asseverate', 'maintain']
+
+>>> synonyms.id_synset('maintain', ['conserve'])
+['conserve', 'preserve', 'maintain', 'keep up']
+```
+Or in general:
+```Python
+>>> synonyms.id_synset('word', ['example', 'example2', ...])
+```
+
+All words, including examples, provided to `id_synset()` must be stemmed, lemmatized, singular, etc.
+
+Attempting to find synonyms for a word that is not in WordNet will result in a `KeyError`. If there are either no synsets for a given word that match the given "example" synonyms, or if the "example" synonyms are insufficient to id one synset, then a `RuntimeError` is raised (although different messages are provided for debugging purposes). Ex:
+```Python
+>>> synonyms.id_synset('asdf', ['junk'])
+KeyError: 'WordNet contains no synsets for word: asdf'
+
+>>> synonyms.id_synset('dog', ['junk'])
+RuntimeError: No synset of <dog> matches keys
+
+>>> synonyms.id_synset('maintain', ['keep'])
+RuntimeError: Keys insufficient to uniquely identify synset, 5 synsets found
+
+>>> synonyms.id_synset('maintain', ['keep', 'hold'])
+['keep', 'maintain', 'hold']
 ```
 
 # Other Usage
