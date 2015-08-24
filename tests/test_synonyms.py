@@ -227,10 +227,10 @@ class TestParaphrase(unittest.TestCase):
             ["B", "C", "D"])
 
     def test_paraphrase_graph_too_large(self):
-        self.fake_graph.add_edge("X", "W")
-        self.fake_graph.add_edge("X", "Y")
-        self.fake_graph.add_edge("X", "Z")
-        self.fake_graph.add_edge("X", "G")
+        self.fake_graph.add_mapping("foo", "X", "W", False)
+        self.fake_graph.add_mapping("foo", "X", "Y", False)
+        self.fake_graph.add_mapping("foo", "X", "Z", False)
+        self.fake_graph.add_mapping("foo", "X", "G", False)
         self.assertTrue(len(self.fake_graph), 11)
         self.assertEqual(
             synonyms._paraphrase_graph(
