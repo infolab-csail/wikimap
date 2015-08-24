@@ -32,7 +32,7 @@ def id_synset(primary, keys):
             keys.pop(0)             # remove used key
 
         if len(sublist) == 0:
-            raise RuntimeError("No synset of '" + primary + "' matches keys")
+            raise RuntimeError("No synset of <" + primary + "> matches keys")
         if len(sublist) > 1:
             raise RuntimeError("Keys insufficient to uniquely identify synset, "
                                + str(len(sublist)) + " synsets found")
@@ -150,7 +150,7 @@ def paraphrase(attribute, infoboxes_for_context,
     """Given an attribute (str) from a Wikipedia infobox and a list of
     infoboxes to use for context-searching, return other attributes
     (and their infobox?) as paraphrases. If attribute does not exist,
-    will raise NetworkXError
+    will raise KeyError
 
     Note on 'intersect' boolean. To be considered: should I do an
     intersection of attributes appropriate for each infobox context,

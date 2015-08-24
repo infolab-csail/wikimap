@@ -18,7 +18,7 @@ class TestIdSynset(unittest.TestCase):
 
     def test_id_synset_single_bad_key(self):
         self.assertRaisesRegexp(
-            RuntimeError, "No synset of 'dog' matches keys",
+            RuntimeError, "No synset of <dog> matches keys",
             synonyms.id_synset, 'dog', ['junk'])
 
     def test_id_synset_bad_primary(self):
