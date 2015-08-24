@@ -6,7 +6,7 @@ from wikimap import data, graph
 from wikimap.config import DATA_DIRECTORY
 
 ontology = infoclass.get_info_ontology()
-master_graph = data.read_graph(DATA_DIRECTORY + "wikimap.gpickle")
+master_graph = data.read_graph(DATA_DIRECTORY + "wikimap-live.gpickle")
 
 
 def clean_wordnet(word):
@@ -97,7 +97,9 @@ def similar_enough(infobox_first,
         within_max_from_infobox = (count_from_first <= max_from_either_infobox and
                                    count_from_second <= max_from_either_infobox)
 
-        return within_max_from_infobox and count_from_root >= min_from_root
+        if within_max_from_infobox and count_from_root >= min_from_root:
+            # print _similarity_between, infobox_first, infobox_second
+            return True
 
 
 def post_paraphrase_cleanup(node_list, exclude_unrend, graph=master_graph):
@@ -114,25 +116,29 @@ def _paraphrase_graph(graph, attribute, infoboxes_for_context,
                       intersect, exclude_unrend):
 
     subgraph = graph.connected_component_with_node(attribute)
-    if len(subgraph) > 10:
+    # print "DEBUG: len(subgraph) = " + str(len(subgraph))
+    # print {node: graph.infoboxes_of_graph_node(node) for node in subgraph}
+    list_of_lists = [[node for node in subgraph if
+                      any(similar_enough(infobox, context.lower())
+                          for infobox in graph.infoboxes_of_graph_node(node))]
+                     for context in infoboxes_for_context]
+    if intersect:
+        # insersect the list_of_lists
+        preliminary_list = list(
+            set(list_of_lists[0]).intersection(*list_of_lists))
+    else:
+        # union the list_of_lists
+        preliminary_list = list(set().union(*list_of_lists))
+
+    if attribute in preliminary_list:
+        preliminary_list.remove(attribute)
+
+    paraphrases = post_paraphrase_cleanup(preliminary_list, exclude_unrend, graph)
+
+    if len(subgraph) > 10 and len(paraphrases) > 5:
         return []
     else:
-        list_of_lists = [[node for node in subgraph if
-                          any(similar_enough(infobox, context.lower())
-                              for infobox in graph.infoboxes_of_graph_node(node))]
-                         for context in infoboxes_for_context]
-        if intersect:
-            # insersect the list_of_lists
-            preliminary_list = list(
-                set(list_of_lists[0]).intersection(*list_of_lists))
-        else:
-            # union the list_of_lists
-            preliminary_list = list(set().union(*list_of_lists))
-
-        if attribute in preliminary_list:
-            preliminary_list.remove(attribute)
-
-        return post_paraphrase_cleanup(preliminary_list, exclude_unrend, graph)
+        return paraphrases
 
 
 # As of now, once this function returns paraphrases from Wikipedia
