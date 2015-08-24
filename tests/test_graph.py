@@ -84,7 +84,7 @@ class TestGeneralNetworkMethods(unittest.TestCase):
 
     def test_connected_component_with_node_not_found(self):
         self.assertRaisesRegexp(
-            nx.exception.NetworkXError, "Node \"junk\" not in graph",
+            KeyError, "Attribute <junk> not in graph",
             self.G.connected_component_with_node, "junk")
 
 

@@ -96,8 +96,7 @@ class WikiMap(nx.DiGraph):
             WikiMap.convert_to_special(component)
             return component
         else:
-            raise nx.exception.NetworkXError(
-                "Node \"" + node + "\" not in graph")
+            raise KeyError("Attribute <" + node + "> not in graph")
 
     # SPECIFIC WIKI INFOBOX/ATTRIBUTE METHODS:
 
