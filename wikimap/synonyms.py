@@ -115,7 +115,7 @@ def _paraphrase_graph(graph, attribute, infoboxes_for_context,
 
     subgraph = graph.connected_component_with_node(attribute)
     list_of_lists = [[node for node in subgraph if
-                      any(similar_enough(infobox, context)
+                      any(similar_enough(infobox, context.lower())
                           for infobox in graph.infoboxes_of_graph_node(node))]
                      for context in infoboxes_for_context]
     if intersect:
@@ -150,5 +150,5 @@ def paraphrase(attribute, infoboxes_for_context,
     precise?) paraphrases
     """
 
-    return _paraphrase_graph(master_graph, attribute, infoboxes_for_context,
-                             intersect, exclude_unrend)
+    return _paraphrase_graph(master_graph, attribute.lower(),
+                             infoboxes_for_context, intersect, exclude_unrend)
