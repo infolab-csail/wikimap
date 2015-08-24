@@ -114,22 +114,25 @@ def _paraphrase_graph(graph, attribute, infoboxes_for_context,
                       intersect, exclude_unrend):
 
     subgraph = graph.connected_component_with_node(attribute)
-    list_of_lists = [[node for node in subgraph if
-                      any(similar_enough(infobox, context.lower())
-                          for infobox in graph.infoboxes_of_graph_node(node))]
-                     for context in infoboxes_for_context]
-    if intersect:
-        # insersect the list_of_lists
-        preliminary_list = list(
-            set(list_of_lists[0]).intersection(*list_of_lists))
+    if len(subgraph) > 10:
+        return []
     else:
-        # union the list_of_lists
-        preliminary_list = list(set().union(*list_of_lists))
+        list_of_lists = [[node for node in subgraph if
+                          any(similar_enough(infobox, context.lower())
+                              for infobox in graph.infoboxes_of_graph_node(node))]
+                         for context in infoboxes_for_context]
+        if intersect:
+            # insersect the list_of_lists
+            preliminary_list = list(
+                set(list_of_lists[0]).intersection(*list_of_lists))
+        else:
+            # union the list_of_lists
+            preliminary_list = list(set().union(*list_of_lists))
 
-    if attribute in preliminary_list:
-        preliminary_list.remove(attribute)
+        if attribute in preliminary_list:
+            preliminary_list.remove(attribute)
 
-    return post_paraphrase_cleanup(preliminary_list, exclude_unrend, graph)
+        return post_paraphrase_cleanup(preliminary_list, exclude_unrend, graph)
 
 
 # As of now, once this function returns paraphrases from Wikipedia
