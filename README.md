@@ -21,8 +21,29 @@ Since `matplotlib` is such a large dependency, but only necessary for graphing n
 $ pip install matplotlib
 ```
 
-# Usage
-The install gives you one Command Line Interface entrypoint called `wikimap`. All commands are run as subcommands of `wikimap`. You can run any subcommand by running:
+# Paraphrase (Quick Start)
+The primary end-product of WikiMap is to paraphrase Wikipedia infobox attributes given some infoboxes as "context" for the paraphrase. You can get this for free simply by **importing WikiMap as a library**:
+```Python
+>>> from wikimap import synonyms
+>>> synonyms.paraphrase("attribute", ["infobox", "other-infobox"])
+```
+Infobox names are case-insensitive, but require dashes instead of spaces. Attribute names have no special requirements, and can have spaces if they so appear on Wikipedia.
+
+As of now, the behavior with multiple infoboxes is: paraphrase for each infobox separately, and union all paraphrases. Intersection is possible if you pass `intersect=True` as an optional argument:
+```Python
+>>> synonyms.paraphrase("attribute", ["infobox", "other-infobox"], intersect=True)
+```
+By default, unrendered attributes are not given as paraphrases. If you want to see unrendered attributes, pass the `exclude_unrend=False` argument:
+```Python
+>>> synonyms.paraphrase("attribute", ["infobox", "other-infobox"], exclude_unrend=False)
+```
+Of course, you can also combine multiple optional arguments together, e.g. 
+```Python
+>>> synonyms.paraphrase("attribute", ["infobox", "other-infobox"], intersect=True, exclude_unrend=False)
+```
+
+# Other Usage
+While WikiMap comes with a pre-compiled WikiMap graph already, it also comes with the souce needed to **make a new WikiMap graph**. The install gives you one Command Line Interface entrypoint called `wikimap`. All commands are run as subcommands of `wikimap`. You can run any subcommand by running:
 ```Bash
 $ wikimap <SUBCOMMAND> <OPTIONS>
 ```
