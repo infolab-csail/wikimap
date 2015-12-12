@@ -2,7 +2,7 @@ import itertools
 import json
 from xlrd import open_workbook
 import networkx as nx
-from wikipediabase.util import get_meta_infobox
+from wikipediabase.infobox import get_meta_infobox
 
 
 # READING
@@ -50,7 +50,7 @@ def get_formal_name(infobox):
 
 def get_single_mappings(infobox):
     """Given one infobox, return its attribute mappings"""
-    return get_meta_infobox(get_formal_name(infobox)).rendered_attributes()
+    return get_meta_infobox(get_formal_name(infobox)).attributes
 
 
 def get_all_mappings(path):
